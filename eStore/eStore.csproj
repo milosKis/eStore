@@ -46,6 +46,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -113,12 +119,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
     </Reference>
@@ -201,6 +201,27 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809071057318_InitialModel.cs" />
+    <Compile Include="Migrations\201809071057318_InitialModel.Designer.cs">
+      <DependentUpon>201809071057318_InitialModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809071103292_UpdatedRegisterViewModel.cs" />
+    <Compile Include="Migrations\201809071103292_UpdatedRegisterViewModel.Designer.cs">
+      <DependentUpon>201809071103292_UpdatedRegisterViewModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809071114599_ModifiedApplicationUser.cs" />
+    <Compile Include="Migrations\201809071114599_ModifiedApplicationUser.Designer.cs">
+      <DependentUpon>201809071114599_ModifiedApplicationUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809071149082_DropNumOfTokensFromAppUser.cs" />
+    <Compile Include="Migrations\201809071149082_DropNumOfTokensFromAppUser.Designer.cs">
+      <DependentUpon>201809071149082_DropNumOfTokensFromAppUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809071149488_AddNumOfTokensFromAppUser.cs" />
+    <Compile Include="Migrations\201809071149488_AddNumOfTokensFromAppUser.Designer.cs">
+      <DependentUpon>201809071149488_AddNumOfTokensFromAppUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -208,6 +229,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\bootstrap-superhero.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -282,6 +304,23 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201809071057318_InitialModel.resx">
+      <DependentUpon>201809071057318_InitialModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809071103292_UpdatedRegisterViewModel.resx">
+      <DependentUpon>201809071103292_UpdatedRegisterViewModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809071114599_ModifiedApplicationUser.resx">
+      <DependentUpon>201809071114599_ModifiedApplicationUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809071149082_DropNumOfTokensFromAppUser.resx">
+      <DependentUpon>201809071149082_DropNumOfTokensFromAppUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809071149488_AddNumOfTokensFromAppUser.resx">
+      <DependentUpon>201809071149488_AddNumOfTokensFromAppUser.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

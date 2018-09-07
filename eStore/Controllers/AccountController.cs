@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity.Validation;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -151,8 +152,19 @@ namespace eStore.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
+                var user = new ApplicationUser {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    NumOfTokens = 0
+                                                 
+                };
+                
+
+                    var result = await UserManager.CreateAsync(user, model.Password);
+                
+
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
@@ -166,6 +178,7 @@ namespace eStore.Controllers
                     return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
+                
             }
 
             // If we got this far, something failed, redisplay form
