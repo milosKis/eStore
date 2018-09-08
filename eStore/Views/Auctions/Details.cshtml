@@ -1,0 +1,62 @@
+﻿@using System.Web.UI.HtmlControls
+@using eStore.Models
+@using Microsoft.Ajax.Utilities
+@using HtmlHelper = System.Web.WebPages.Html.HtmlHelper
+@model eStore.Models.Auction
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Auction details</h2>
+<hr/>
+
+<div class="row">
+    <div class="col-sm-4">
+        @{
+            string imreBase64Data = Convert.ToBase64String(@Model.Image);
+            string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+        }
+        <img src="@imgDataUrl" style="width:100%" />
+    </div>
+    <div class="col-sm-8">
+        <table class="table table-dark table-hover table-striped table-bordered">
+            <tr>
+                <td>@Html.DisplayNameFor(m => m.Name)</td>
+                <td>@Model.Name</td>
+            </tr>
+            <tr>
+                <td>Owner</td>
+                <td>@Model.User.FirstName @Model.User.LastName</td>
+            </tr>
+            <tr>
+                <td>Owner's email</td>
+                <td>@Model.User.Email</td>
+            </tr>
+            <tr>
+                <td>State</td>
+                <td>
+                    @if (Model.State == AuctionState.Ready)
+                    {
+                        <span class="badge badge-primary">@Model.State</span>
+                    }
+                    else if (Model.State == AuctionState.Opened)
+                    {
+                        <span class="badge badge-success">@Model.State</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-secondary">@Model.State</span>
+                    }
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-4">
+       
+    </div>
+</div>

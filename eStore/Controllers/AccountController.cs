@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using eStore.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace eStore.Controllers
 {
@@ -167,6 +168,12 @@ namespace eStore.Controllers
 
                 if (result.Succeeded)
                 {
+                    //temp code for Manager Role!
+                    //var roleStore = new RoleStore<IdentityRole>(new ApplicationDbContext());
+                    //var roleManager = new RoleManager<IdentityRole>(roleStore);
+                    //await roleManager.CreateAsync(new IdentityRole("MaintenanceManager"));
+                    //await UserManager.AddToRoleAsync(user.Id, "MaintenanceManager");
+
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771

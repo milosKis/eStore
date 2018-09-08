@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using eStore.Models
+@using System
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -21,9 +23,17 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    @if (User.IsInRole(RoleName.MaintenanceManager))
+                    {
+                        <li>
+                            @Html.ActionLink("Auctions", "IndexReady", "Auctions")
+                        </li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("Search auctions", "Index", "Auctions")</li>
+                    }
+
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

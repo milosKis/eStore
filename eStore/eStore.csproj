@@ -196,6 +196,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AuctionsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
@@ -221,10 +222,35 @@
     <Compile Include="Migrations\201809071149488_AddNumOfTokensFromAppUser.Designer.cs">
       <DependentUpon>201809071149488_AddNumOfTokensFromAppUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809080822573_AuctionModelCreated.cs" />
+    <Compile Include="Migrations\201809080822573_AuctionModelCreated.Designer.cs">
+      <DependentUpon>201809080822573_AuctionModelCreated.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809080836474_AddedImageToUploadToAuction.cs" />
+    <Compile Include="Migrations\201809080836474_AddedImageToUploadToAuction.Designer.cs">
+      <DependentUpon>201809080836474_AddedImageToUploadToAuction.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809081132584_AddedDateTimeOpenedDeletedFile.cs" />
+    <Compile Include="Migrations\201809081132584_AddedDateTimeOpenedDeletedFile.Designer.cs">
+      <DependentUpon>201809081132584_AddedDateTimeOpenedDeletedFile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809081213364_AuctionModified.cs" />
+    <Compile Include="Migrations\201809081213364_AuctionModified.Designer.cs">
+      <DependentUpon>201809081213364_AuctionModified.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809081258049_AuctionModelModifiedDateTimeCreated.cs" />
+    <Compile Include="Migrations\201809081258049_AuctionModelModifiedDateTimeCreated.Designer.cs">
+      <DependentUpon>201809081258049_AuctionModelModifiedDateTimeCreated.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Auction.cs" />
+    <Compile Include="Models\AuctionState.cs" />
+    <Compile Include="Models\CreateAuctionViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\NumberBiggerThanZero.cs" />
+    <Compile Include="Models\RoleName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -288,6 +314,9 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Auctions\Create.cshtml" />
+    <Content Include="Views\Auctions\Details.cshtml" />
+    <Content Include="Views\Auctions\IndexReady.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -320,6 +349,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809071149488_AddNumOfTokensFromAppUser.resx">
       <DependentUpon>201809071149488_AddNumOfTokensFromAppUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809080822573_AuctionModelCreated.resx">
+      <DependentUpon>201809080822573_AuctionModelCreated.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809080836474_AddedImageToUploadToAuction.resx">
+      <DependentUpon>201809080836474_AddedImageToUploadToAuction.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809081132584_AddedDateTimeOpenedDeletedFile.resx">
+      <DependentUpon>201809081132584_AddedDateTimeOpenedDeletedFile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809081213364_AuctionModified.resx">
+      <DependentUpon>201809081213364_AuctionModified.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809081258049_AuctionModelModifiedDateTimeCreated.resx">
+      <DependentUpon>201809081258049_AuctionModelModifiedDateTimeCreated.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

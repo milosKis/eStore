@@ -1,0 +1,28 @@
+﻿@model List<eStore.Models.Auction>
+@{
+    ViewBag.Title = "IndexOpened";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>List of created auctions</h2>
+
+<ul style="list-style: none">
+    @foreach (var auction in Model)
+    {
+        <li>
+            <div class="card" style="width:200px; border: 1px solid orange; margin: 10px; padding: 10px;" align="center">
+                @{
+                    string imreBase64Data = Convert.ToBase64String(@auction.Image);
+                    string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+                }
+                <img class="card-img-top" style="width: 100px; height: 150px;"src="@imgDataUrl" alt="Card image">
+                <div class="card-body">
+                    <h4 class="card-title">@auction.Name</h4>
+                    <p class="card-text">Some example text.</p>
+                    <a href="#" class="btn btn-primary">Start</a>
+                </div>
+            </div>
+        </li>
+    }
+</ul>
+
