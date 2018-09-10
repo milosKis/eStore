@@ -1,0 +1,114 @@
+﻿@using eStore.Models
+@model List<eStore.Models.Auction>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Auctions</h2>
+
+<table id="auctions" class="table table-hover table-stripped" style="border: 1px solid orange" cellspacing="20px">
+    <thead>
+        <tr>
+
+            <th>Name</th>
+            <th>Status</th>
+            <th>Remaining time</th>
+            <th>Current price</th>
+            <th>Bid now</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        @foreach (var auction in Model)
+        {
+            
+
+        <tr>
+
+
+
+            @{
+                string imreBase64Data = Convert.ToBase64String(@auction.Image);
+                string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+                long time = (long)auction.DateTimeCreated.ToUniversalTime().Subtract(
+                new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                ).TotalMilliseconds + auction.Duration * 1000;
+
+            }
+
+            <td>
+                <div>
+                    <img style="width: 100px; height: 150px; margin-right: 20px;" src="@imgDataUrl" alt="Card image">
+                    <span class="badge"><text>@auction.Name</text></span>
+                </div>
+            </td>
+
+
+            <td style="vertical-align: middle;">@auction.State</td>
+            <td style="vertical-align: middle;"><span class="badge"><text id="@auction.Id"></text></span></td>
+            <td style="vertical-align: middle;">@auction.CurrentPrice</td>
+            <td style="vertical-align: middle;"><a href="#" class="btn btn-primary">Start</a></td>
+            @if (auction.State == AuctionState.Ready)
+            {
+                <script>
+
+                var countDownDate = new Date("Jan 5, 2019 15:37:25").getTime();
+                var id = @auction.Id;
+                // Update the count down every 1 second
+                var x = setInterval(function() {
+
+                    // Get todays date and time
+                    var now = new Date().getTime();
+
+                    // Find the distance between now and the count down date
+                    var distance = @time - now;
+                    // document.writeln(now + " " + @time + " " + distance);
+
+                    // Time calculations for days, hours, minutes and seconds
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // Display the result in the element with id="demo"
+                    document.getElementById("@auction.Id").innerHTML =
+                                            days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+
+                    // If the count down is finished, write some text
+                    if (distance <= 0) {
+                        clearInterval(x);
+                        document.getElementById("@auction.Id").innerHTML = "0";
+                    }
+                    }, 1000);
+
+                </script>
+            }
+
+        </tr>
+                    
+
+        }
+    </tbody>
+</table>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function() {
+            $("#auctions").DataTable({
+                    
+                    "columnDefs": [
+                        { "orderable": false, "targets": 4 }
+                    ]
+
+                }
+            );
+        });
+    </script>
+}
+
+
+
+

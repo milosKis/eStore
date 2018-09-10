@@ -28,7 +28,9 @@ namespace eStore.Controllers
         // GET: Auctions
         public ActionResult Index()
         {
-            return View();
+            var auctions = _context.Auctions.ToList();
+
+            return View(auctions);
         }
 
         [Authorize(Roles = RoleName.MaintenanceManager)]
