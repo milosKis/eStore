@@ -8,6 +8,8 @@ using System.Web.Mvc;
 using eStore.Models;
 using Microsoft.AspNet.Identity;
 using System.Data.Entity;
+using Microsoft.Ajax.Utilities;
+using PagedList;
 
 namespace eStore.Controllers
 {
@@ -26,11 +28,59 @@ namespace eStore.Controllers
         }
 
         // GET: Auctions
-        public ActionResult Index()
+        public ActionResult Index(string currentFilter, string searchString, int? lowPrice, int? highPrice, string state, int? page)
         {
-            var auctions = _context.Auctions.ToList();
+            
 
-            return View(auctions);
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var auctions = _context.Auctions.Where(a => a.Duration > 0);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                auctions = auctions.Where(a => a.Name.Contains(searchString));
+            }
+
+            if (lowPrice != null)
+            {
+                auctions = auctions.Where(a => a.CurrentPrice >= lowPrice);
+            }
+
+            ViewBag.LowPrice = lowPrice;
+
+            if (highPrice != null)
+            {
+                auctions = auctions.Where(a => a.CurrentPrice >= highPrice);
+            }
+
+            ViewBag.HighPrice = highPrice;
+
+            if (String.IsNullOrEmpty(state))
+            {
+                ViewBag.State = "ALL";
+            }
+            else
+            {
+                ViewBag.State = state;
+                auctions = auctions.Where(a => a.State == state);
+            }
+
+            //auctions.OrderBy(a => a.Name);
+
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            //return View(auctions.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize));
+            return View(PagedListExtensions.ToPagedList(auctions.OrderBy(a => a.Name), pageNumber, pageSize));
+
         }
 
         [Authorize(Roles = RoleName.MaintenanceManager)]

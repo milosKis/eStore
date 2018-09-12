@@ -46,13 +46,31 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetNuke, Version=9.2.1.533, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetNuke.Core.9.2.1.533\lib\net40\DotNetNuke.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetNuke.Web, Version=9.2.1.533, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetNuke.Web.9.2.1.533\lib\net40\DotNetNuke.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetNuke.WebUtility, Version=4.2.1.783, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetNuke.Web.9.2.1.533\lib\net40\DotNetNuke.WebUtility.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ApplicationBlocks.Data, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetNuke.Core.9.2.1.533\lib\net40\Microsoft.ApplicationBlocks.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -242,15 +260,19 @@
     <Compile Include="Migrations\201809081258049_AuctionModelModifiedDateTimeCreated.Designer.cs">
       <DependentUpon>201809081258049_AuctionModelModifiedDateTimeCreated.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809110846091_AuctionIdModified.cs" />
+    <Compile Include="Migrations\201809110846091_AuctionIdModified.Designer.cs">
+      <DependentUpon>201809110846091_AuctionIdModified.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\Auction.cs" />
-    <Compile Include="Models\AuctionState.cs" />
-    <Compile Include="Models\CreateAuctionViewModel.cs" />
-    <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\NumberBiggerThanZero.cs" />
-    <Compile Include="Models\RoleName.cs" />
+    <Compile Include="fonts\Models\AccountViewModels.cs" />
+    <Compile Include="fonts\Models\Auction.cs" />
+    <Compile Include="fonts\Models\AuctionState.cs" />
+    <Compile Include="fonts\Models\CreateAuctionViewModel.cs" />
+    <Compile Include="fonts\Models\IdentityModels.cs" />
+    <Compile Include="fonts\Models\ManageViewModels.cs" />
+    <Compile Include="fonts\Models\NumberBiggerThanZero.cs" />
+    <Compile Include="fonts\Models\RoleName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -367,6 +389,7 @@
     <Content Include="Content\DataTables\images\sort_desc.png" />
     <Content Include="Content\DataTables\images\sort_desc_disabled.png" />
     <Content Include="Content\DataTables\swf\flashExport.swf" />
+    <Content Include="Content\PagedList.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -540,6 +563,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809081258049_AuctionModelModifiedDateTimeCreated.resx">
       <DependentUpon>201809081258049_AuctionModelModifiedDateTimeCreated.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809110846091_AuctionIdModified.resx">
+      <DependentUpon>201809110846091_AuctionIdModified.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
