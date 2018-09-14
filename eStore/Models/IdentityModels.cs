@@ -5,6 +5,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using eStore.fonts.Models;
 
 namespace eStore.Models
 {
@@ -34,6 +35,7 @@ namespace eStore.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Auction> Auctions { get; set; }
+        public DbSet<AppSetting> AppSettings { get; set; }
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

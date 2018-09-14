@@ -217,6 +217,11 @@
     <Compile Include="Controllers\AuctionsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="Models\AppSetting.cs" />
+    <Compile Include="Models\Constants.cs" />
+    <Compile Include="Models\NumberBiggerThanZeroSettings.cs" />
+    <Compile Include="Models\UpdateSettingsViewModel.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -264,15 +269,19 @@
     <Compile Include="Migrations\201809110846091_AuctionIdModified.Designer.cs">
       <DependentUpon>201809110846091_AuctionIdModified.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809141605186_AddedModelAppSetting.cs" />
+    <Compile Include="Migrations\201809141605186_AddedModelAppSetting.Designer.cs">
+      <DependentUpon>201809141605186_AddedModelAppSetting.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="fonts\Models\AccountViewModels.cs" />
-    <Compile Include="fonts\Models\Auction.cs" />
-    <Compile Include="fonts\Models\AuctionState.cs" />
-    <Compile Include="fonts\Models\CreateAuctionViewModel.cs" />
-    <Compile Include="fonts\Models\IdentityModels.cs" />
-    <Compile Include="fonts\Models\ManageViewModels.cs" />
-    <Compile Include="fonts\Models\NumberBiggerThanZero.cs" />
-    <Compile Include="fonts\Models\RoleName.cs" />
+    <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Auction.cs" />
+    <Compile Include="Models\AuctionState.cs" />
+    <Compile Include="Models\CreateAuctionViewModel.cs" />
+    <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\NumberBiggerThanZero.cs" />
+    <Compile Include="Models\RoleName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -516,6 +525,9 @@
     <Content Include="Views\Auctions\Details.cshtml" />
     <Content Include="Views\Auctions\IndexReady.cshtml" />
     <Content Include="Views\Auctions\Index.cshtml" />
+    <Content Include="Views\Account\Edit.cshtml" />
+    <Content Include="Views\Settings\Update.cshtml" />
+    <Content Include="Views\Settings\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -566,6 +578,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809110846091_AuctionIdModified.resx">
       <DependentUpon>201809110846091_AuctionIdModified.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809141605186_AddedModelAppSetting.resx">
+      <DependentUpon>201809141605186_AddedModelAppSetting.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

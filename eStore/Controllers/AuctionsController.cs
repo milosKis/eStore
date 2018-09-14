@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity;
 using System.Data.Entity;
 using Microsoft.Ajax.Utilities;
 using PagedList;
+using eStore.Models;
 
 namespace eStore.Controllers
 {
@@ -43,12 +44,7 @@ namespace eStore.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var auctions = _context.Auctions.Where(a => a.Duration > 0);
-
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                auctions = auctions.Where(a => a.Name.Contains(searchString));
-            }
+            var auctions = _context.Auctions.Include(a => a.User).Where(a => a.Duration > 0);
 
             if (lowPrice != null)
             {
@@ -59,7 +55,7 @@ namespace eStore.Controllers
 
             if (highPrice != null)
             {
-                auctions = auctions.Where(a => a.CurrentPrice >= highPrice);
+                auctions = auctions.Where(a => a.CurrentPrice <= highPrice);
             }
 
             ViewBag.HighPrice = highPrice;
@@ -74,21 +70,117 @@ namespace eStore.Controllers
                 auctions = auctions.Where(a => a.State == state);
             }
 
-            //auctions.OrderBy(a => a.Name);
+            List<Auction> newList;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                newList = new List<Auction>();
+                var words = searchString.Split(' ');
+
+                foreach (var auction in auctions)
+                {
+                    foreach (var word in words)
+                    {
+                        if (auction.Name.ToLower().Contains(word.ToLower()))
+                        {
+                            newList.Add(auction);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                newList = auctions.ToList();
+            }
 
             int pageSize = 10;
+            var size = _context.AppSettings.SingleOrDefault(s => s.Name == "NumOfItemsPerPage");
+            if (size != null)
+            {
+                pageSize = Int32.Parse(size.Value);
+            }
+            
             int pageNumber = (page ?? 1);
             //return View(auctions.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize));
-            return View(PagedListExtensions.ToPagedList(auctions.OrderBy(a => a.Name), pageNumber, pageSize));
+            return View(PagedListExtensions.ToPagedList(newList.OrderBy(a => a.DateTimeCreated), pageNumber, pageSize));
 
         }
 
         [Authorize(Roles = RoleName.MaintenanceManager)]
-        public ActionResult IndexReady()
+        public ActionResult IndexReady(string currentFilter, string searchString, int? lowPrice, int? highPrice, int? page)
         {
-            var auctions = _context.Auctions.Where(a => a.State == AuctionState.Ready).ToList();
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
 
-            return View(auctions);
+            ViewBag.CurrentFilter = searchString;
+
+            var auctions = _context.Auctions.Include(a => a.User).Where(a => a.State == AuctionState.Ready);
+
+            if (lowPrice != null)
+            {
+                auctions = auctions.Where(a => a.CurrentPrice >= lowPrice);
+            }
+
+            ViewBag.LowPrice = lowPrice;
+
+            if (highPrice != null)
+            {
+                auctions = auctions.Where(a => a.CurrentPrice <= highPrice);
+            }
+
+            ViewBag.HighPrice = highPrice;
+
+            List<Auction> newList;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                newList = new List<Auction>();
+                var words = searchString.Split(' ');
+
+                foreach (var auction in auctions)
+                {
+                    foreach (var word in words)
+                    {
+                        if (auction.Name.ToLower().Contains(word.ToLower()))
+                        {
+                            newList.Add(auction);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                newList = auctions.ToList();
+            }
+
+            int pageSize = 10;
+            var size = _context.AppSettings.SingleOrDefault(s => s.Name == "NumOfItemsPerPage");
+            if (size != null)
+            {
+                pageSize = Int32.Parse(size.Value);
+            }
+            int pageNumber = (page ?? 1);
+
+            return View(PagedListExtensions.ToPagedList(newList.OrderBy(a => a.DateTimeCreated), pageNumber, pageSize));
+        }
+
+        [Authorize(Roles = RoleName.MaintenanceManager)]
+        public ActionResult Update(int id, string state)
+        {
+            var auction = _context.Auctions.Include(a => a.User).SingleOrDefault(a => a.Id == id);
+            if (auction == null)
+                return HttpNotFound();
+            auction.State = state;
+            auction.DateTimeOpened = DateTime.Now;
+             _context.SaveChanges();
+            
+            return RedirectToAction("IndexReady", "Auctions");
         }
 
         [Authorize]

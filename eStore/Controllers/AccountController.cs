@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using DotNetNuke.Services.Messaging.Data;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using eStore.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
+using DotNetNuke.UI.UserControls;
 
 namespace eStore.Controllers
 {
@@ -19,9 +24,11 @@ namespace eStore.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext _context;
 
         public AccountController()
         {
+            _context = new ApplicationDbContext();
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
@@ -162,8 +169,8 @@ namespace eStore.Controllers
                                                  
                 };
                 
-
-                    var result = await UserManager.CreateAsync(user, model.Password);
+               
+                var result = await UserManager.CreateAsync(user, model.Password);
                 
 
                 if (result.Succeeded)
@@ -190,6 +197,85 @@ namespace eStore.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(EditViewModel model)
+        {
+            var userId = User.Identity.GetUserId();
+            ApplicationUser user = _context.Users.SingleOrDefault(u => u.Id == userId);
+            if (ModelState.IsValid)
+            {
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Email = model.Email;
+                user.UserName = model.Email;
+
+                //var result = await UserManager.UpdateAsync(user);  1
+                //var result = await UserManager.CreateAsync(user, model.Password);
+
+
+                //if (result.Succeeded) 2
+               // { 3
+                    //temp code for Manager Role!
+                    //var roleStore = new RoleStore<IdentityRole>(new ApplicationDbContext());
+                    //var roleManager = new RoleManager<IdentityRole>(roleStore);
+                    //await roleManager.CreateAsync(new IdentityRole("MaintenanceManager"));
+                    //await UserManager.AddToRoleAsync(user.Id, "MaintenanceManager");
+
+                    //Da li ukljuciti ovo
+                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
+                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
+                    // Send an email with this link
+                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+                    //return RedirectToAction("Index", "Home"); 4
+                //}  5
+                //AddErrors(result);  6
+                try
+                {
+                    _context.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    return RedirectToAction("Edit", new {Message = "This is another's users email!"});
+                }
+
+                
+            }
+
+            model.FirstName = user.FirstName;
+            model.LastName = user.LastName;
+            model.Email = user.Email;
+            model.Message = "Saved!";
+            
+            return View(model);
+        }
+
+        [Authorize]
+        public ActionResult Edit()
+        {
+            var userId = User.Identity.GetUserId();
+            ApplicationUser user = _context.Users.SingleOrDefault(u => u.Id == userId);
+            EditViewModel model = new EditViewModel()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,   
+                Message = ""
+            };
+
+            return View("Edit", model);
+        }
+
+        [Authorize]
+        public ActionResult ChangePassword()
+        {
+            return View("~/Views/Manage/ChangePassword.cshtml");
         }
 
         //
@@ -425,6 +511,7 @@ namespace eStore.Controllers
 
         protected override void Dispose(bool disposing)
         {
+            _context.Dispose();
             if (disposing)
             {
                 if (_userManager != null)

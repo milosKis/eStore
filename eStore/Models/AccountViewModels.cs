@@ -90,6 +90,24 @@ namespace eStore.Models
         public string ConfirmPassword { get; set; }
     }
 
+    public class EditViewModel
+    {
+        [Required]
+        [Display(Name = "First name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last name")]
+        public string LastName { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+
+        public string Message { get; set; }
+    }
+
     public class ResetPasswordViewModel
     {
         [Required]

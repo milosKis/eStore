@@ -1,28 +1,80 @@
-﻿@model List<eStore.Models.Auction>
+﻿@model PagedList.IPagedList<eStore.Models.Auction>
+@using eStore.Models
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 @{
-    ViewBag.Title = "IndexOpened";
+    ViewBag.Title = "IndexReady";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>List of created auctions</h2>
+<h2>Auctions</h2>
 
-<ul style="list-style: none">
-    @foreach (var auction in Model)
-    {
-        <li>
-            <div class="card" style="width:200px; border: 1px solid orange; margin: 10px; padding: 10px;" align="center">
-                @{
-                    string imreBase64Data = Convert.ToBase64String(@auction.Image);
-                    string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
-                }
-                <img class="card-img-top" style="width: 100px; height: 150px;"src="@imgDataUrl" alt="Card image">
-                <div class="card-body">
-                    <h4 class="card-title">@auction.Name</h4>
-                    <p class="card-text">Some example text.</p>
-                    <a href="#" class="btn btn-primary">Start</a>
-                </div>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-sm-3 form-group">
+            @Html.Label("Name")
+            @Html.TextBox("searchString", ViewBag.CurrentFilter as string, new { placeholder = "", @class = "form-control" })
+        </div>
+        <div class="col-sm-3 form-group">
+            @Html.Label("Lowest price")
+            @Html.TextBox("lowPrice", "", new { placeholder = "", @class = "form-control" })
+        </div>
+        <div class="col-sm-3 form-group">
+            @Html.Label("Highest price")
+            @Html.TextBox("highPrice", "", new { placeholder = "", @class = "form-control" })
+        </div>
+        <div class="col-sm-1 form-group">
+            @Html.Label("   ")
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </div>
+}
+@foreach (var auction in Model)
+{
+
+    <div class="col-sm-3">
+
+
+
+        @{
+            string imreBase64Data = Convert.ToBase64String(@auction.Image);
+            string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+        }
+
+        <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
+            <div style="border-bottom: 1px solid #df691a; margin-bottom: 5px;"><h4 class="card-title">@auction.Name</h4></div>
+            <a href='@Url.Action("Details", "Auctions", new { id = auction.Id })' style="text-decoration: none;">
+                <img class="card-img-top" style="width: 100px; height: 150px; margin-bottom: 5px;" src="@imgDataUrl" alt="Card image">
+            </a>
+            <div class="card-body">
+                <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
+                <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice</span><br />
+                <span class="label label-default" style="margin-bottom: 5px;">@auction.User.FirstName @auction.User.LastName</span><br />
+                <button class="btn btn-primary" style="margin: 5px;"><a href='@Url.Action("Update", "Auctions", new { id = auction.Id, state = AuctionState.Opened })' style="text-decoration: none; color: white;">Start</a></button>
             </div>
-        </li>
-    }
-</ul>
+        </div>
+    </div>
+}
+
+<br />
+<div class="row">
+    <div class="col-sm-12">
+        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+        @Html.PagedListPager(Model, page => Url.Action("Index",
+            new { page, currentFilter = ViewBag.CurrentFilter }))
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(window).ready(function() {
+            $(".active a").css("background-color", "#df691a");
+        });
+    </script>
+}
+
+
 

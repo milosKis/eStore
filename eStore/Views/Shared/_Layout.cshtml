@@ -23,17 +23,25 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Search auctions", "Index", "Auctions")</li>
+
                     @if (User.IsInRole(RoleName.MaintenanceManager))
                     {
                         <li>
-                            @Html.ActionLink("Auctions", "IndexReady", "Auctions")
+                            @Html.ActionLink("Auction requests", "IndexReady", "Auctions")
                         </li>
+                        
                     }
                     else
                     {
-                        <li>@Html.ActionLink("Search auctions", "Index", "Auctions")</li>
+                        if (Request.IsAuthenticated)
+                        {
+                            <li>
+                                @Html.ActionLink("New auction", "New", "Auctions")
+                            </li>
+                            
+                        }
                     }
-
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

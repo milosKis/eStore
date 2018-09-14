@@ -9,13 +9,18 @@
 }
 
 <h2>Auction details</h2>
-<hr/>
+<hr />
 
 <div class="row">
     <div class="col-sm-4">
         @{
             string imreBase64Data = Convert.ToBase64String(@Model.Image);
             string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+            long time = 0;
+            if (Model.State == AuctionState.Opened)
+            {
+                time = (long)(((DateTime)Model.DateTimeOpened).Ticks - DateTime.Now.Ticks) / TimeSpan.TicksPerMillisecond + Model.Duration * 1000;
+            }
         }
         <img src="@imgDataUrl" style="width:100%" />
     </div>
@@ -38,7 +43,7 @@
                 <td>
                     @if (Model.State == AuctionState.Ready)
                     {
-                        <span class="badge badge-primary">@Model.State</span>
+                        <span class="badge badge-default">@Model.State</span>
                     }
                     else if (Model.State == AuctionState.Opened)
                     {
@@ -46,10 +51,27 @@
                     }
                     else
                     {
-                        <span class="badge badge-secondary">@Model.State</span>
+                        <span class="badge badge-danger">@Model.State</span>
                     }
 
                 </td>
+            </tr>
+            @if (Model.State == AuctionState.Opened)
+            {
+                <tr>
+                    <td>Remaining time:</td>
+                    <td><text id="@Model.Id" time="@time"></text></td>
+                </tr>
+            }
+            <tr>
+                <td>Current price</td>
+                <td>@Model.CurrentPrice</td>
+            </tr>
+            <tr>
+                <td>
+                    Last bidder:
+                </td>
+                <td></td>
             </tr>
         </table>
     </div>
@@ -57,6 +79,64 @@
 
 <div class="row">
     <div class="col-sm-4">
-       
+
     </div>
 </div>
+
+
+@section scripts
+{
+    <script>
+        $(window).ready(function() {
+            $(".active a").css("background-color", "#df691a");
+            $("td text").each(function() {
+                timer($(this).attr("id"), $(this).attr("time"));
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        var counter = 0;
+        var array = new Array();
+
+        function timer(id, time) {
+            // Update the count down every 1 second
+            if (time.charAt(0) == '-') {
+                document.getElementById(id).innerHTML = "EXPIRED";
+                return;
+            }
+            time = parseInt(time);
+            time += new Date().getTime();
+            var x = setInterval(function () { callBack(id, time, counter); }, 1000);
+            array[counter++] = x;
+        }
+
+
+
+
+        function callBack(id, time, counter) {
+            time = parseInt(time);
+            var now = new Date().getTime();
+            counter = parseInt(counter);
+
+            // Find the distance between now and the count down date
+            var distance = time - now;
+            if (distance <= 0) {
+                clearInterval(counter);
+                document.getElementById(id).innerHTML = "EXPIRED";
+                return;
+            } else {
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="demo"
+                document.getElementById(id).innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+            }
+            // If the count down is finished, write some text
+        }
+
+    </script>
+}

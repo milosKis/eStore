@@ -1,4 +1,5 @@
 ﻿@model PagedList.IPagedList<eStore.Models.Auction>
+@using eStore.Models
 @using PagedList.Mvc;
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 @{
@@ -71,18 +72,51 @@
     @{
         string imreBase64Data = Convert.ToBase64String(@auction.Image);
         string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
-        long time = (long)(auction.DateTimeCreated.Ticks - DateTime.Now.Ticks) / TimeSpan.TicksPerMillisecond + auction.Duration * 1000;
-    }
+        long time = 0;
+        if (auction.State == AuctionState.Opened)
+        {
+            time = (long)(((DateTime)auction.DateTimeOpened).Ticks - DateTime.Now.Ticks) / TimeSpan.TicksPerMillisecond + auction.Duration * 1000;
+        }
 
+    }
+    
         <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
-            <img class="card-img-top" style="width: 100px; height: 150px;" src="@imgDataUrl" alt="Card image">
+            <div style="border-bottom: 1px solid #df691a; margin-bottom: 5px;"><h4 class="card-title">@auction.Name</h4></div>
+            <a href='@Url.Action("Details", "Auctions", new { id = auction.Id })' style="text-decoration: none;">
+                <img class="card-img-top" style="width: 100px; height: 150px; margin-bottom: 5px;" src="@imgDataUrl" alt="Card image">
+            </a>
             <div class="card-body">
-                <h4 class="card-title">@auction.Name</h4>
-                <p class="card-text">@auction.CurrentPrice</p>
-                <a href="#" class="btn btn-primary">Start</a>
-                <text id="@auction.Id" time="@time"></text>
+                @if (auction.State == AuctionState.Completed)
+                {
+                    <span class="label label-danger" style="margin-bottom: 5px;">@auction.State</span><br />
+                    <br/>                                                                        
+                }
+                else if (auction.State == AuctionState.Opened)
+                {
+                    <span class="label label-success" style="margin-bottom: 5px;">@auction.State</span><br />
+                    <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id" time="@time"></text></span><br />
+                }
+                else
+                {
+                    <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
+                    <br/>
+                }
+
+                <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice</span><br />
+                <span class="label label-default" style="margin-bottom: 5px;">@auction.User.FirstName @auction.User.LastName</span><br />
+
+                @if (Request.IsAuthenticated && auction.State == AuctionState.Opened)
+                {
+                    <button class="btn btn-primary" style="margin: 5px;">Bid</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary" style="margin: 5px;" disabled="disabled" name="@auction.Id">Bid</button>
+                }
+
+
             </div>
-        </div>
+</div>
 </div>
 }
 
@@ -101,7 +135,7 @@
     <script>
         $(window).ready(function() {
             $(".active a").css("background-color", "#df691a");
-            $("text").each(function() {
+            $("span text").each(function() {
                 timer($(this).attr("id"), $(this).attr("time"));
             });
         });
@@ -114,7 +148,7 @@
         function timer(id, time) {
             // Update the count down every 1 second
             if (time.charAt(0) == '-') {
-                document.getElementById(id).innerHTML = "0";
+                document.getElementById(id).innerHTML = "EXPIRED";
                 return;
             }
             time = parseInt(time);
@@ -135,7 +169,7 @@
             var distance = time - now;
             if (distance <= 0) {
                 clearInterval(counter);
-                document.getElementById(id).innerHTML = "0";
+                document.getElementById(id).innerHTML = "EXPIRED";
                 return;
             } else {
                 // Time calculations for days, hours, minutes and seconds
@@ -150,7 +184,7 @@
             // If the count down is finished, write some text
         }
 
-    </script>>
+    </script>
 }
 
 
