@@ -12,5 +12,8 @@ namespace eStore.fonts.Models
         public const string NumOfItemsPerPage = "NumOfItemsPerPage";
         public const string TokenValue = "TokenValue";
         public const string Duration = "Duration";
+        public const string Silver = "Silver";
+        public const string Gold = "Gold";
+        public const string Platinum = "Platinum";
     }
 }

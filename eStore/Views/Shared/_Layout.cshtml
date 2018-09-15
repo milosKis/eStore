@@ -30,7 +30,7 @@
                         <li>
                             @Html.ActionLink("Auction requests", "IndexReady", "Auctions")
                         </li>
-                        
+
                     }
                     else
                     {
@@ -39,7 +39,10 @@
                             <li>
                                 @Html.ActionLink("New auction", "New", "Auctions")
                             </li>
-                            
+                            <li>
+                                @Html.ActionLink("Order tokens", "Create", "TokenOrders")
+                            </li>
+
                         }
                     }
                 </ul>

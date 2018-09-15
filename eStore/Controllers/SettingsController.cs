@@ -46,6 +46,9 @@ namespace eStore.Controllers
             string CurrentCurrency = _context.AppSettings.SingleOrDefault(s => s.Name == Constants.CurrentCurrency).Value;
             model.CurrentCurrency = CurrentCurrency;
             model.Currencies = CurrentCurrency;
+            model.Silver = Int32.Parse((_context.AppSettings.SingleOrDefault(s => s.Name == Constants.Silver)).Value);
+            model.Gold = Int32.Parse((_context.AppSettings.SingleOrDefault(s => s.Name == Constants.Gold)).Value);
+            model.Platinum = Int32.Parse((_context.AppSettings.SingleOrDefault(s => s.Name == Constants.Platinum)).Value);
 
             var currencies = _context.AppSettings.ToList();
             foreach (var currency in currencies)
@@ -95,6 +98,19 @@ namespace eStore.Controllers
             appSetting = _context.AppSettings.SingleOrDefault(s => s.Name == Constants.NumOfItemsPerPage);
             appSetting.Value = model.NumOfItemsPerPage + "";
             _context.SaveChanges();
+
+            appSetting = _context.AppSettings.SingleOrDefault(s => s.Name == Constants.Silver);
+            appSetting.Value = model.Silver + "";
+            _context.SaveChanges();
+
+            appSetting = _context.AppSettings.SingleOrDefault(s => s.Name == Constants.Gold);
+            appSetting.Value = model.Gold + "";
+            _context.SaveChanges();
+
+            appSetting = _context.AppSettings.SingleOrDefault(s => s.Name == Constants.Platinum);
+            appSetting.Value = model.Platinum + "";
+            _context.SaveChanges();
+
             model.Message = "Saved!";
 
             return View("Update", model);

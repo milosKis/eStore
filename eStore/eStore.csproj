@@ -218,9 +218,14 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="Controllers\TokenOrdersController.cs" />
+    <Compile Include="Migrations\201809151943198_SqlSilverGoldPlatinum.cs" />
+    <Compile Include="Migrations\201809151943198_SqlSilverGoldPlatinum.Designer.cs">
+      <DependentUpon>201809151943198_SqlSilverGoldPlatinum.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AppSetting.cs" />
     <Compile Include="Models\Constants.cs" />
-    <Compile Include="Models\NumberBiggerThanZeroSettings.cs" />
+    <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\UpdateSettingsViewModel.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -403,6 +408,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="images\gold.png" />
+    <Content Include="images\platinum.png" />
+    <Content Include="images\silver.png" />
     <Content Include="Scripts\bootbox.js" />
     <Content Include="Scripts\bootbox.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -528,6 +536,7 @@
     <Content Include="Views\Account\Edit.cshtml" />
     <Content Include="Views\Settings\Update.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
+    <Content Include="Views\TokenOrders\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -581,6 +590,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809141605186_AddedModelAppSetting.resx">
       <DependentUpon>201809141605186_AddedModelAppSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809151943198_SqlSilverGoldPlatinum.resx">
+      <DependentUpon>201809151943198_SqlSilverGoldPlatinum.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

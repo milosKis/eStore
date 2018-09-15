@@ -18,17 +18,32 @@ namespace eStore.fonts.Models
         public string CurrentCurrency { get; set; }
 
         [Required]
-        [NumberBiggerThanZeroSettings]
+        [NumberBiggerThanZeroDuration]
         [Display(Name = "Default auction's duration")]
         public int Duration { get; set; }
 
         [Required]
-        [NumberBiggerThanZeroSettings]
+        [NumberBiggerThanZeroTokenValue]
         [Display(Name = "Token value")]
         public double TokenValue { get; set; }
 
         [Required]
-        [NumberBiggerThanZeroSettings]
+        [SilverRestrictions]
+        [Display(Name = "Silver package")]
+        public int Silver { get; set; }
+
+        [Required]
+        [GoldRestrictions]
+        [Display(Name = "Gold package")]
+        public int Gold { get; set; }
+
+        [Required]
+        [PlatinumRestrictions]
+        [Display(Name = "Platinum package")]
+        public int Platinum { get; set; }
+
+        [Required]
+        [NumberBiggerThanZeroPageNumber]
         [Display(Name = "Number of items per page")]
         public double NumOfItemsPerPage { get; set; }
 
