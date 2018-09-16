@@ -21,7 +21,7 @@ namespace eStore.Models
         public string LastName { get; set; }
 
         [Display(Name = "Number of tokens")]
-        public int NumOfTokens { get; set; }
+        public double NumOfTokens { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -36,6 +36,8 @@ namespace eStore.Models
     {
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<AppSetting> AppSettings { get; set; }
+        public DbSet<Bid> Bids { get; set; }
+        public DbSet<TokenOrder> TokenOrders { get; set; }
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

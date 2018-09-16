@@ -32,7 +32,7 @@ namespace eStore.Controllers
         public ActionResult Index(string currentFilter, string searchString, int? lowPrice, int? highPrice, string state, int? page)
         {
             
-
+            CheckAuctions();  //checks if there are opened auctions that expired
             if (searchString != null)
             {
                 page = 1;
@@ -105,6 +105,52 @@ namespace eStore.Controllers
             return View(PagedListExtensions.ToPagedList(newList.OrderBy(a => a.DateTimeCreated), pageNumber, pageSize));
 
         }
+
+        private void CheckAuctions()
+        {
+            List<Auction> auctions = _context.Auctions.Include(a => a.LastBidder).Where(a => a.State == AuctionState.Opened).ToList();
+            foreach (var auction in auctions)
+            {
+                if ((DateTime.Now - auction.DateTimeOpened.Value).TotalSeconds > auction.Duration)
+                {
+                    auction.DateTimeClosed = DateTime.Now;
+                    auction.State = AuctionState.Completed;
+                    if (auction.LastBidder != null)
+                    {
+                        string title = "Auction win!";
+                        string message = $"Congratulations! You have won the auction " + auction.Name + " " + auction.Id + "!";
+                        string email = auction.LastBidder.Email;
+                        //this is place for code that actually sends email
+                    }
+
+                    _context.SaveChanges();
+                   
+                    
+
+                }
+            }
+        }
+
+
+        public void CompleteAuction(int id)
+        {
+            Auction auction = _context.Auctions.SingleOrDefault(a => a.Id == id);
+            if (auction != null)
+            {
+                auction.DateTimeClosed = DateTime.Now;
+                auction.State = AuctionState.Completed;
+                if (auction.LastBidder != null)
+                {
+                    string title = "Auction win!";
+                    string message = $"Congratulations! You have won the auction " + auction.Name + " " + auction.Id + "!";
+                    string email = auction.LastBidder.Email;
+                    //this is place for code that actually sends email
+                }
+
+                _context.SaveChanges();
+            }
+        }
+
 
         [Authorize(Roles = RoleName.MaintenanceManager)]
         public ActionResult IndexReady(string currentFilter, string searchString, int? lowPrice, int? highPrice, int? page)
@@ -215,9 +261,17 @@ namespace eStore.Controllers
             auctionViewModel.ImageFile.InputStream.Read(auction.Image, 0, auction.Image.Length);
             auction.CurrentPrice = auction.StartingPrice;
             auction.State = AuctionState.Ready;
+            auction.Currency = CurrentCurrency();
 
             _context.Auctions.Add(auction);
-            _context.SaveChanges(); 
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (DbEntityValidationException e)
+            {
+                Console.WriteLine(e);
+            }
 
             return View("Details", auction);
         }
@@ -230,6 +284,11 @@ namespace eStore.Controllers
                 return HttpNotFound();
 
             return View(auction);
+        }
+
+        public string CurrentCurrency()
+        {
+            return _context.AppSettings.SingleOrDefault(s => s.Name == eStore.fonts.Models.Constants.CurrentCurrency).Value;
         }
     }
 }

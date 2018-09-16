@@ -11,25 +11,25 @@
     selectList.Add(new SelectListItem
     {
         Text = "All",
-        Value = ""
+        Value = "All"
     });
 
     selectList.Add(new SelectListItem
     {
         Text = "Ready",
-        Value = "READY"
+        Value = AuctionState.Ready
     });
 
     selectList.Add(new SelectListItem
     {
         Text = "Opened",
-        Value = "Opened"
+        Value = AuctionState.Opened
     });
 
     selectList.Add(new SelectListItem
     {
-        Text = "Closed",
-        Value = "Closed"
+        Text = "Completed",
+        Value = AuctionState.Completed
     });
 
 
@@ -93,7 +93,10 @@
                 }
                 else if (auction.State == AuctionState.Opened)
                 {
-                    <span class="label label-success" style="margin-bottom: 5px;">@auction.State</span><br />
+                    <div id="@auction.Id state">
+                        <span class="label label-success" style="margin-bottom: 5px;" >@auction.State</span><br />
+                    </div>
+                    
                     <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id" time="@time"></text></span><br />
                 }
                 else
@@ -102,18 +105,19 @@
                     <br/>
                 }
 
-                <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice</span><br />
+                <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice @auction.Currency</span><br />
                 <span class="label label-default" style="margin-bottom: 5px;">@auction.User.FirstName @auction.User.LastName</span><br />
-
-                @if (Request.IsAuthenticated && auction.State == AuctionState.Opened)
+                
+                <div id="@auction.Id btn">
+                @if (Request.IsAuthenticated && auction.State == AuctionState.Opened && !User.IsInRole(RoleName.MaintenanceManager))
                 {
-                    <button class="btn btn-primary" style="margin: 5px;">Bid</button>
+                    <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;">Bid</button>
                 }
                 else
                 {
-                    <button class="btn btn-primary" style="margin: 5px;" disabled="disabled" name="@auction.Id">Bid</button>
+                    <button class="btn btn-primary" style="margin: 5px;" disabled="disabled">Bid</button>
                 }
-
+                </div>
 
             </div>
 </div>
@@ -148,7 +152,9 @@
         function timer(id, time) {
             // Update the count down every 1 second
             if (time.charAt(0) == '-') {
-                document.getElementById(id).innerHTML = "EXPIRED";
+                document.getElementById(id).innerHTML = "";
+                document.getElementById(id + " state").innerHTML = "<span class='label label-danger' style='margin-bottom: 5px;' >COMPLETED</span><br />";
+                document.getElementById(id + " btn").innerHTML = "<button class='btn btn-primary' style='margin: 5px;' disabled='disabled'>Bid</button>";
                 return;
             }
             time = parseInt(time);
@@ -169,7 +175,18 @@
             var distance = time - now;
             if (distance <= 0) {
                 clearInterval(counter);
-                document.getElementById(id).innerHTML = "EXPIRED";
+                document.getElementById(id).innerHTML = "";
+                document.getElementById(id + " state").innerHTML = "<span class='label label-danger' style='margin-bottom: 5px;' >COMPLETED</span><br />";
+                document.getElementById(id + " btn").innerHTML = "<button class='btn btn-primary' style='margin: 5px;' disabled='disabled'>Bid</button>";
+                $.ajax({
+                    type: "POST",
+                    url: "/Auctions/CompleteAuction/" + id,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function () {
+
+                    }
+                });
                 return;
             } else {
                 // Time calculations for days, hours, minutes and seconds

@@ -49,7 +49,7 @@
             </a>
             <div class="card-body">
                 <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
-                <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice</span><br />
+                <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice @auction.Currency</span><br />
                 <span class="label label-default" style="margin-bottom: 5px;">@auction.User.FirstName @auction.User.LastName</span><br />
                 <button class="btn btn-primary" style="margin: 5px;"><a href='@Url.Action("Update", "Auctions", new { id = auction.Id, state = AuctionState.Opened })' style="text-decoration: none; color: white;">Start</a></button>
             </div>

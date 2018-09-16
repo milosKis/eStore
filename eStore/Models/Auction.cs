@@ -42,7 +42,12 @@ namespace eStore.Models
         [StringLength(10)]
         public string State { get; set; }
 
-        [Required]
         public ApplicationUser User { get; set; }
+
+        [Display(Name = "Last bidder")]
+        public ApplicationUser LastBidder { get; set; }
+
+        [Required]
+        public string Currency { get; set; }
     }
 }

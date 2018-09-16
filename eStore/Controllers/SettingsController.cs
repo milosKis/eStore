@@ -116,5 +116,10 @@ namespace eStore.Controllers
             return View("Update", model);
 
         }
+
+        public string CurrentCurrency()
+        {
+            return _context.AppSettings.SingleOrDefault(s => s.Name == Constants.CurrentCurrency).Value;
+        }
     }
 }

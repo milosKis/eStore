@@ -223,9 +223,40 @@
     <Compile Include="Migrations\201809151943198_SqlSilverGoldPlatinum.Designer.cs">
       <DependentUpon>201809151943198_SqlSilverGoldPlatinum.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809161450326_AddedLastBidderToAuctionModel.cs" />
+    <Compile Include="Migrations\201809161450326_AddedLastBidderToAuctionModel.Designer.cs">
+      <DependentUpon>201809161450326_AddedLastBidderToAuctionModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809161453570_AddedCurrencyToAuctionModel.cs" />
+    <Compile Include="Migrations\201809161453570_AddedCurrencyToAuctionModel.Designer.cs">
+      <DependentUpon>201809161453570_AddedCurrencyToAuctionModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809161511470_ModifiedTypeNumberOfTokensFromIntToDouble.cs" />
+    <Compile Include="Migrations\201809161511470_ModifiedTypeNumberOfTokensFromIntToDouble.Designer.cs">
+      <DependentUpon>201809161511470_ModifiedTypeNumberOfTokensFromIntToDouble.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809161516056_AddedBidModel.cs" />
+    <Compile Include="Migrations\201809161516056_AddedBidModel.Designer.cs">
+      <DependentUpon>201809161516056_AddedBidModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809161549207_AddedTokenOrderModel.cs" />
+    <Compile Include="Migrations\201809161549207_AddedTokenOrderModel.Designer.cs">
+      <DependentUpon>201809161549207_AddedTokenOrderModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809161822280_AddedAuctionToBidModel.cs" />
+    <Compile Include="Migrations\201809161822280_AddedAuctionToBidModel.Designer.cs">
+      <DependentUpon>201809161822280_AddedAuctionToBidModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809161934474_ModifiedAuctionModel.cs" />
+    <Compile Include="Migrations\201809161934474_ModifiedAuctionModel.Designer.cs">
+      <DependentUpon>201809161934474_ModifiedAuctionModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AppSetting.cs" />
+    <Compile Include="Models\Bid.cs" />
     <Compile Include="Models\Constants.cs" />
     <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\TokenOrder.cs" />
+    <Compile Include="Models\TokenOrderState.cs" />
     <Compile Include="Models\UpdateSettingsViewModel.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -593,6 +624,27 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809151943198_SqlSilverGoldPlatinum.resx">
       <DependentUpon>201809151943198_SqlSilverGoldPlatinum.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809161450326_AddedLastBidderToAuctionModel.resx">
+      <DependentUpon>201809161450326_AddedLastBidderToAuctionModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809161453570_AddedCurrencyToAuctionModel.resx">
+      <DependentUpon>201809161453570_AddedCurrencyToAuctionModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809161511470_ModifiedTypeNumberOfTokensFromIntToDouble.resx">
+      <DependentUpon>201809161511470_ModifiedTypeNumberOfTokensFromIntToDouble.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809161516056_AddedBidModel.resx">
+      <DependentUpon>201809161516056_AddedBidModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809161549207_AddedTokenOrderModel.resx">
+      <DependentUpon>201809161549207_AddedTokenOrderModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809161822280_AddedAuctionToBidModel.resx">
+      <DependentUpon>201809161822280_AddedAuctionToBidModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809161934474_ModifiedAuctionModel.resx">
+      <DependentUpon>201809161934474_ModifiedAuctionModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
