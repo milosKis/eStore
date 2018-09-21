@@ -1,0 +1,48 @@
+﻿@model List<eStore.Models.TokenOrder>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>My orders</h2>
+
+@if (Model.Count == 0)
+{
+    <h3>You haven't ordered anything yet!</h3>
+}
+else
+{
+    <table id="orders" class="table table-hover" style="margin-top: 40px;">
+        <thead>
+        <tr>
+            <th>Ordered on</th>
+            <th>Number of tokens</th>
+            <th>Price</th>
+            <th>Currency</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach(var order in Model)
+            {
+                <tr>
+                    <td>@order.DateTimeCreated</td>
+                    <td>@order.NumOfTokens</td>
+                    <td>@order.Price</td>
+                    <td>@order.Currency</td>
+                    <td>@order.State</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@section scripts 
+{
+    <script>
+        $(document).ready(function() {
+            $('#orders').DataTable();
+        });
+    </script>
+}

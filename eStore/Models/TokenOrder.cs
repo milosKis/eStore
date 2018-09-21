@@ -9,7 +9,7 @@ namespace eStore.Models
 {
     public class TokenOrder
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public int NumOfTokens { get; set; }
@@ -23,7 +23,8 @@ namespace eStore.Models
         [Required]
         public string Currency { get; set; }
 
-        [Required]
         public ApplicationUser User { get; set; }
+
+        public DateTime? DateTimeCreated { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model eStore.fonts.Models.UpdateSettingsViewModel
+﻿@model eStore.Models.TokenOrderViewModel
 @{
     ViewBag.Title = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,66 +6,68 @@
 
 <h2>Order</h2>
 
-@using (Html.BeginForm("UpdateAll", "Settings", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Create", "TokenOrders", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 <div class="form-horizontal">
     <h4>Make new order</h4>
+    <div class="row">
+        <div class="col-sm-4" align="center">
+            <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
+                <img class="card-img-top" src="~/images/silver.png" alt="Silver package">
+                <div class="card-body">
+                    <h4 class="card-title">Silver package</h4>
+                    <p class="card-text">Count: @ViewBag.SilverCount</p>
+                    <p class="card-text">Price: @ViewBag.SilverPrice @ViewBag.CurrentCurrency</p>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            @Html.EditorFor(model => model.SilverCount, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.SilverCount, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div class="col-sm-4" align="center">
-        <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
-            <img class="card-img-top" src="~/images/silver.png" alt="Silver package">
-            <div class="card-body">
-                <h4 class="card-title">Silver package</h4>
-                <p class="card-text">Count: @ViewBag.SilverCount</p>
-                <p class="card-text">Price: @ViewBag.SilverPrice @ViewBag.CurrentCurrency</p>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-8">
-                        @Html.EditorFor(model => model.Silver, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Silver, "", new { @class = "text-danger" })
+        <div class="col-sm-4" align="center">
+            <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
+                <img class="card-img-top" src="~/images/gold.png" alt="Gold package">
+                <div class="card-body">
+                    <h4 class="card-title">Gold package</h4>
+                    <p class="card-text">Count: @ViewBag.GoldCount</p>
+                    <p class="card-text">Price: @ViewBag.GoldPrice @ViewBag.CurrentCurrency</p>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            @Html.EditorFor(model => model.GoldCount, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.GoldCount, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4" align="center">
+            <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
+                <img class="card-img-top" src="~/images/platinum.png" alt="Platinum package">
+                <div class="card-body">
+                    <h4 class="card-title">Platinum package</h4>
+                    <p class="card-text">Count: @ViewBag.PlatinumCount</p>
+                    <p class="card-text">Price: @ViewBag.PlatinumPrice @ViewBag.CurrentCurrency</p>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            @Html.EditorFor(model => model.PlatinumCount, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.PlatinumCount, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="col-sm-4" align="center">
-        <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
-            <img class="card-img-top" src="~/images/gold.png" alt="Gold package">
-            <div class="card-body">
-                <h4 class="card-title">Gold package</h4>
-                <p class="card-text">Count: @ViewBag.GoldCount</p>
-                <p class="card-text">Price: @ViewBag.GoldPrice @ViewBag.CurrentCurrency</p>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-8">
-                        @Html.EditorFor(model => model.Gold, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Gold, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-4" align="center">
-        <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
-            <img class="card-img-top" src="~/images/platinum.png" alt="Platinum package">
-            <div class="card-body">
-                <h4 class="card-title">Platinum package</h4>
-                <p class="card-text">Count: @ViewBag.PlatinumCount</p>
-                <p class="card-text">Price: @ViewBag.PlatinumPrice @ViewBag.CurrentCurrency</p>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-8">
-                        @Html.EditorFor(model => model.Platinum, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Platinum, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="form-group">
-        <div class="col-sm-offset-5 col-sm-2" align="center">
-            <input type="submit" value="" class="btn" style="margin-top: 40px; background:url(https://www.centili.com/images/centili-widget-button.png) no-repeat; width:147px; ">
+        <div class="row">
+            <div class="col-sm-offset-5 col-sm-2" align="center">
+                <input type="submit" value="" class="btn" style="margin-top: 40px; background:url(https://www.centili.com/images/centili-widget-button.png) no-repeat; width:147px; ">
+            </div>
         </div>
     </div>
     

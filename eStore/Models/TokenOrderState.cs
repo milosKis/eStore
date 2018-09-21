@@ -8,7 +8,7 @@ namespace eStore.Models
     public static class TokenOrderState
     {
         public const string Submitted = "SUBMITED";
-        public const string Canceled = "Canceled";
-        public const string Completed = "Completed";
+        public const string Canceled = "CANCELED";
+        public const string Completed = "COMPLETED";
     }
 }

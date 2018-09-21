@@ -16,7 +16,6 @@ namespace eStore.Models
         [Required]
         public double NumOfTokens { get; set; }
 
-        [Required]
         public ApplicationUser User { get; set; }
 
         [Required]

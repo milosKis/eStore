@@ -215,6 +215,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AuctionsController.cs" />
+    <Compile Include="Controllers\BidsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
@@ -251,12 +252,33 @@
     <Compile Include="Migrations\201809161934474_ModifiedAuctionModel.Designer.cs">
       <DependentUpon>201809161934474_ModifiedAuctionModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809210852392_ModifiedIdOfOrderToGuid.cs" />
+    <Compile Include="Migrations\201809210852392_ModifiedIdOfOrderToGuid.Designer.cs">
+      <DependentUpon>201809210852392_ModifiedIdOfOrderToGuid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809210858424_AddedDateTimeCreatedToTokenOrders.cs" />
+    <Compile Include="Migrations\201809210858424_AddedDateTimeCreatedToTokenOrders.Designer.cs">
+      <DependentUpon>201809210858424_AddedDateTimeCreatedToTokenOrders.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809210859304_AddedDateTimeCreatedToTokenOrders1.cs" />
+    <Compile Include="Migrations\201809210859304_AddedDateTimeCreatedToTokenOrders1.Designer.cs">
+      <DependentUpon>201809210859304_AddedDateTimeCreatedToTokenOrders1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809211243452_UserNotRequiredToTokenOrder.cs" />
+    <Compile Include="Migrations\201809211243452_UserNotRequiredToTokenOrder.Designer.cs">
+      <DependentUpon>201809211243452_UserNotRequiredToTokenOrder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809211600165_UserMadeNotRequiredBidModel.cs" />
+    <Compile Include="Migrations\201809211600165_UserMadeNotRequiredBidModel.Designer.cs">
+      <DependentUpon>201809211600165_UserMadeNotRequiredBidModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AppSetting.cs" />
     <Compile Include="Models\Bid.cs" />
     <Compile Include="Models\Constants.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\TokenOrder.cs" />
     <Compile Include="Models\TokenOrderState.cs" />
+    <Compile Include="Models\TokenOrderViewModel.cs" />
     <Compile Include="Models\UpdateSettingsViewModel.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -442,6 +464,7 @@
     <Content Include="images\gold.png" />
     <Content Include="images\platinum.png" />
     <Content Include="images\silver.png" />
+    <Content Include="images\token.png" />
     <Content Include="Scripts\bootbox.js" />
     <Content Include="Scripts\bootbox.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -568,9 +591,11 @@
     <Content Include="Views\Settings\Update.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
     <Content Include="Views\TokenOrders\Create.cshtml" />
+    <Content Include="Views\TokenOrders\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Bid\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -645,6 +670,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809161934474_ModifiedAuctionModel.resx">
       <DependentUpon>201809161934474_ModifiedAuctionModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809210852392_ModifiedIdOfOrderToGuid.resx">
+      <DependentUpon>201809210852392_ModifiedIdOfOrderToGuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809210858424_AddedDateTimeCreatedToTokenOrders.resx">
+      <DependentUpon>201809210858424_AddedDateTimeCreatedToTokenOrders.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809210859304_AddedDateTimeCreatedToTokenOrders1.resx">
+      <DependentUpon>201809210859304_AddedDateTimeCreatedToTokenOrders1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809211243452_UserNotRequiredToTokenOrder.resx">
+      <DependentUpon>201809211243452_UserNotRequiredToTokenOrder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809211600165_UserMadeNotRequiredBidModel.resx">
+      <DependentUpon>201809211600165_UserMadeNotRequiredBidModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

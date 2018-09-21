@@ -1,5 +1,6 @@
 ﻿@model PagedList.IPagedList<eStore.Models.Auction>
 @using eStore.Models
+@using Microsoft.AspNet.Identity
 @using PagedList.Mvc;
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 @{
@@ -32,54 +33,67 @@
         Value = AuctionState.Completed
     });
 
+    string userId = "";
+    if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+    {
+        userId = User.Identity.GetUserId();
+    }
 
 }
 
 <h2>Auctions</h2>
+@if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+{
+    <div>
+        <div id="tokens" style="float: left;">@ViewBag.NumOfTokens</div>&nbsp;&nbsp;
+        <img src="~/images/token.png" />
+    </div>
+
+}
 
 @using (Html.BeginForm())
 {
-<div class="row">
-    <div class="col-sm-3 form-group">
-        @Html.Label("Name")
-        @Html.TextBox("searchString", ViewBag.CurrentFilter as string, new { placeholder = "", @class = "form-control" })
+    <div class="row">
+        <div class="col-sm-3 form-group">
+            @Html.Label("Name")
+            @Html.TextBox("searchString", ViewBag.CurrentFilter as string, new { placeholder = "", @class = "form-control" })
+        </div>
+        <div class="col-sm-3 form-group">
+            @Html.Label("Lowest price")
+            @Html.TextBox("lowPrice", "", new { placeholder = "", @class = "form-control" })
+        </div>
+        <div class="col-sm-3 form-group">
+            @Html.Label("Highest price")
+            @Html.TextBox("highPrice", "", new { placeholder = "", @class = "form-control" })
+        </div>
+        <div class="col-sm-2 form-group">
+            @Html.Label("State")
+            @Html.DropDownList("state", selectList, new { @class = "form-control" })
+        </div>
+        <div class="col-sm-1 form-group">
+            @Html.Label("   ")
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
     </div>
-    <div class="col-sm-3 form-group">
-        @Html.Label("Lowest price")
-        @Html.TextBox("lowPrice", "", new { placeholder = "", @class = "form-control" })
-    </div>
-    <div class="col-sm-3 form-group">
-        @Html.Label("Highest price")
-        @Html.TextBox("highPrice", "", new { placeholder = "", @class = "form-control" })
-    </div>
-    <div class="col-sm-2 form-group">
-        @Html.Label("State")
-        @Html.DropDownList("state", selectList, new {@class = "form-control"})
-    </div>
-    <div class="col-sm-1 form-group">
-        @Html.Label("   ")
-        <button class="btn btn-primary" type="submit">Search</button>
-    </div>
-</div>
 }
-    @foreach (var auction in Model)
-    {
+@foreach (var auction in Model)
+{
 
-<div class="col-sm-3">
+    <div class="col-sm-3">
 
 
 
-    @{
-        string imreBase64Data = Convert.ToBase64String(@auction.Image);
-        string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
-        long time = 0;
-        if (auction.State == AuctionState.Opened)
-        {
-            time = (long)(((DateTime)auction.DateTimeOpened).Ticks - DateTime.Now.Ticks) / TimeSpan.TicksPerMillisecond + auction.Duration * 1000;
+        @{
+            string imreBase64Data = Convert.ToBase64String(@auction.Image);
+            string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+            long time = 0;
+            if (auction.State == AuctionState.Opened)
+            {
+                time = (long)(((DateTime)auction.DateTimeOpened).Ticks - DateTime.Now.Ticks) / TimeSpan.TicksPerMillisecond + auction.Duration * 1000;
+            }
+
         }
 
-    }
-    
         <div class="card" style="width:200px; border: 1px solid #df691a; margin: 10px; margin-left: 0px; padding: 10px;" align="center">
             <div style="border-bottom: 1px solid #df691a; margin-bottom: 5px;"><h4 class="card-title">@auction.Name</h4></div>
             <a href='@Url.Action("Details", "Auctions", new { id = auction.Id })' style="text-decoration: none;">
@@ -89,39 +103,46 @@
                 @if (auction.State == AuctionState.Completed)
                 {
                     <span class="label label-danger" style="margin-bottom: 5px;">@auction.State</span><br />
-                    <br/>                                                                        
+                    <br />
                 }
                 else if (auction.State == AuctionState.Opened)
                 {
                     <div id="@auction.Id state">
-                        <span class="label label-success" style="margin-bottom: 5px;" >@auction.State</span><br />
+                        <span class="label label-success" style="margin-bottom: 5px;">@auction.State</span><br />
                     </div>
-                    
+
                     <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id" time="@time"></text></span><br />
                 }
                 else
                 {
                     <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
-                    <br/>
+                    <br />
                 }
 
-                <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice @auction.Currency</span><br />
-                <span class="label label-default" style="margin-bottom: 5px;">@auction.User.FirstName @auction.User.LastName</span><br />
-                
+                <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id price">@auction.CurrentPrice @auction.Currency</span><br />
+                <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id name">@auction.User.FirstName @auction.User.LastName</text></span><br />
+
                 <div id="@auction.Id btn">
-                @if (Request.IsAuthenticated && auction.State == AuctionState.Opened && !User.IsInRole(RoleName.MaintenanceManager))
-                {
-                    <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;">Bid</button>
-                }
-                else
-                {
-                    <button class="btn btn-primary" style="margin: 5px;" disabled="disabled">Bid</button>
-                }
+                    @if (Request.IsAuthenticated && auction.State == AuctionState.Opened && !User.IsInRole(RoleName.MaintenanceManager))
+                    {
+                        if (auction.LastBidder != null)
+                        {
+                            <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,1, @ViewBag.TokenValue, @auction.Id)">Bid</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,0, @ViewBag.TokenValue, @auction.Id)">Bid</button>
+                        }
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary" style="margin: 5px;" disabled="disabled">Bid</button>
+                    }
                 </div>
 
             </div>
-</div>
-</div>
+        </div>
+    </div>
 }
 
 <br />
@@ -137,9 +158,9 @@
 @section scripts
 {
     <script>
-        $(window).ready(function() {
+        $(window).ready(function () {
             $(".active a").css("background-color", "#df691a");
-            $("span text").each(function() {
+            $("span text[time]").each(function () {
                 timer($(this).attr("id"), $(this).attr("time"));
             });
         });
@@ -163,8 +184,8 @@
             array[counter++] = x;
         }
 
-        
-    
+
+
 
         function callBack(id, time, counter) {
             time = parseInt(time);
@@ -199,6 +220,44 @@
                 document.getElementById(id).innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
             }
             // If the count down is finished, write some text
+        }
+
+
+        function bid(currentPrice, notFirst, tokenValue, auctionId) {
+            notFirst = parseInt(notFirst);
+            tokenValue = parseFloat(tokenValue);
+            var tokens = document.getElementById("tokens").innerHTML;
+            tokens = parseFloat(tokens);
+            currentPrice = parseFloat(currentPrice);
+            var tokensNeeded = (currentPrice / tokenValue) + 1;
+            if (notFirst == 0)
+                tokensNeeded = currentPrice / tokenValue;
+
+            if (tokens < tokensNeeded) {
+                bootbox.alert("You don't have enough tokens!",
+                    function (result) {
+                        if (result) {
+
+                        }
+                    });
+            } else {
+                tokens = tokens - tokensNeeded;
+                currentPrice = currentPrice + tokenValue;
+                document.getElementById("tokens").innerHTML = tokens + "";
+                document.getElementById(auctionId + " price").innerHTML = currentPrice + "";
+                document.getElementById(auctionId + " name").innerHTML = "YOU";
+                //document.getElementById(auctionId + " btn").innerHTML = "<button class='btn btn-primary' style='margin: 5px;' disabled='disabled'>Bid</button>";
+                $.ajax({
+                    type: "GET",
+                    url: "/Bids/Create/?numOfTokens=1&auctionId=" + auctionId,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function () {
+
+                    }
+                });
+            }
+
         }
 
     </script>

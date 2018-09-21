@@ -23,27 +23,52 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Search auctions", "Index", "Auctions")</li>
+                    <li>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                Auctions
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Search", "Index", "Auctions")</li>
+                                @if (User.IsInRole(RoleName.MaintenanceManager))
+                                {
+                                    <li>
+                                        @Html.ActionLink("Requests", "IndexReady", "Auctions")
+                                    </li>
 
-                    @if (User.IsInRole(RoleName.MaintenanceManager))
+                                }
+                                else if (Request.IsAuthenticated)
+                                {
+                                    <li>
+                                        @Html.ActionLink("My auctions", "IndexMy", "Auctions")
+                                    </li>
+                                    <li>
+                                        @Html.ActionLink("New", "New", "Auctions")
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </li>
+
+            
+                    @if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
                     {
-                        <li>
-                            @Html.ActionLink("Auction requests", "IndexReady", "Auctions")
-                        </li>
 
-                    }
-                    else
-                    {
-                        if (Request.IsAuthenticated)
-                        {
                             <li>
-                                @Html.ActionLink("New auction", "New", "Auctions")
-                            </li>
-                            <li>
-                                @Html.ActionLink("Order tokens", "Create", "TokenOrders")
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                        Tokens
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>@Html.ActionLink("Order", "New", "TokenOrders")</li>
+                                        <li>@Html.ActionLink("My orders", "Index", "TokenOrders")</li>
+                                    </ul>
+                                </div>
                             </li>
 
-                        }
+                       
                     }
                 </ul>
                 @Html.Partial("_LoginPartial")

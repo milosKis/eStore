@@ -17,11 +17,11 @@ namespace eStore.Models
         public HttpPostedFileBase ImageFile { get; set; }
 
         [Required]
-        [NumberBiggerThanZero]
+        [NumberBiggerThanZeroDuration]
         public long Duration { get; set; }
 
         [Required]
-        [NumberBiggerThanZero]
+        [NumberBiggerThanZeroStartingPrice]
         [Display(Name = "Starting price")]
         public double StartingPrice { get; set; }
     }

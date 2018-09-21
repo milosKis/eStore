@@ -6,13 +6,26 @@ using System.Web;
 
 namespace eStore.Models
 {
-    public class NumberBiggerThanZero : ValidationAttribute
+    public class NumberBiggerThanZeroStartingPrice : ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var auctionViewModel = (CreateAuctionViewModel) validationContext.ObjectInstance;
 
-            if (auctionViewModel.StartingPrice <= 0 || auctionViewModel.Duration <= 0)
+            if (auctionViewModel.StartingPrice <= 0)
+                return new ValidationResult("Value of this field has to be greater than 0");
+
+            return ValidationResult.Success;
+        }
+    }
+
+    public class NumberBiggerThanZeroDuration : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            var auctionViewModel = (CreateAuctionViewModel)validationContext.ObjectInstance;
+
+            if (auctionViewModel.Duration <= 0)
                 return new ValidationResult("Value of this field has to be greater than 0");
 
             return ValidationResult.Success;

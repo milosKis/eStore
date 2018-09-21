@@ -101,6 +101,13 @@ namespace eStore.Controllers
             }
             
             int pageNumber = (page ?? 1);
+            if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+            {
+                var userId = User.Identity.GetUserId();
+                ViewBag.NumOfTokens = _context.Users.SingleOrDefault(u => u.Id == userId).NumOfTokens;
+                var tokenValue = eStore.fonts.Models.Constants.TokenValue;
+                ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
+            }
             //return View(auctions.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize));
             return View(PagedListExtensions.ToPagedList(newList.OrderBy(a => a.DateTimeCreated), pageNumber, pageSize));
 
