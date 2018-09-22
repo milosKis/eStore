@@ -2,13 +2,30 @@
 @using eStore.Models
 @using Microsoft.Ajax.Utilities
 @using HtmlHelper = System.Web.WebPages.Html.HtmlHelper
+@using Microsoft.AspNet.Identity;
 @model eStore.Models.Auction
 @{
     ViewBag.Title = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string userId = "";
+    string user = "";
+    if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+    {
+        userId = User.Identity.GetUserId();
+        user = User.Identity.GetUserName();
+    }
 }
 
 <h2>Auction details</h2>
+@if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+{
+    <div>
+        <div id="tokens" style="float: left;">@ViewBag.NumOfTokens</div>&nbsp;&nbsp;
+        <img src="~/images/token.png" />
+    </div>
+
+}
 <hr />
 
 <div class="row">
@@ -32,10 +49,6 @@
             </tr>
             <tr>
                 <td>Owner</td>
-                <td>@Model.User.FirstName @Model.User.LastName</td>
-            </tr>
-            <tr>
-                <td>Owner's email</td>
                 <td>@Model.User.Email</td>
             </tr>
             <tr>
@@ -43,15 +56,15 @@
                 <td>
                     @if (Model.State == AuctionState.Ready)
                     {
-                        <span class="badge badge-default">@Model.State</span>
+                        <span class="label label-default">@Model.State</span>
                     }
                     else if (Model.State == AuctionState.Opened)
                     {
-                        <span class="badge badge-success">@Model.State</span>
+                        <span class="label label-success">@Model.State</span>
                     }
                     else
                     {
-                        <span class="badge badge-danger">@Model.State</span>
+                        <span class="label label-danger">@Model.State</span>
                     }
 
                 </td>
@@ -65,21 +78,43 @@
             }
             <tr>
                 <td>Current price</td>
-                <td>@Model.CurrentPrice @Model.Currency</td>
+                <td id="price">@Model.CurrentPrice @Model.Currency</td>
             </tr>
             <tr>
                 <td>
                     Last bidder:
                 </td>
-                <td></td>
+                @if (Model.LastBidder != null)
+                {
+                    <td id="bidder">@Model.LastBidder.UserName</td>
+                }
+                else
+                {
+                    <td id="bidder">No bidder</td>
+                }
             </tr>
         </table>
+
+        @if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager) && (userId != Model.User.Id))
+        {
+                <div class="row">
+                    <div class="col-sm-3 form-group">
+                        @Html.Label("Number of tokens")
+                        @Html.TextBox("numOfTokens", "", new { placeholder = "", @class = "form-control" })
+                    </div>
+                    @Html.Hidden("auctionId", Model.Id)
+                    <div class="col-sm-1 form-group">
+                        @Html.Label("   ")
+                        <button class="btn btn-primary" onclick="bid(@Model.CurrentPrice)">Bid</button>
+                    </div>
+                </div>
+        }
     </div>
 </div>
 
 <div class="row">
     <div class="col-sm-4">
-
+        
     </div>
 </div>
 
@@ -87,9 +122,9 @@
 @section scripts
 {
     <script>
-        $(window).ready(function() {
+        $(window).ready(function () {
             $(".active a").css("background-color", "#df691a");
-            $("td text").each(function() {
+            $("td text").each(function () {
                 timer($(this).attr("id"), $(this).attr("time"));
             });
         });
@@ -136,6 +171,57 @@
                 document.getElementById(id).innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
             }
             // If the count down is finished, write some text
+        }
+
+
+        function bid(currentPrice) {
+            tokenValue = parseFloat(@ViewBag.tokenValue);
+            var tokens = document.getElementById("tokens").innerHTML;
+            tokens = parseFloat(tokens);
+            currentPrice = parseFloat(currentPrice);
+            var tokensNeeded = (currentPrice / tokenValue);
+            //if (document.getElementById("bidder").innerHTML != "No bidder")
+                //tokensNeeded++;
+            var tokensToBid = document.getElementById("numOfTokens").value;
+            if (isNaN(tokensToBid)) {
+                bootbox.alert("You didn't enter appropriate value!",
+                    function () { });
+                return;
+            }
+
+            if (parseInt(tokensToBid) != parseFloat(tokensToBid)) {
+                bootbox.alert("You need to enter integer value!",
+                    function () {});
+                return;
+            }
+
+            tokensToBid = parseFloat(tokensToBid);
+            if (tokensToBid < 0) {
+                bootbox.alert("You need to enter positive value!",
+                    function () { });
+                return;
+            }
+            else if ((tokensToBid == 0) && (document.getElementById("bidder").innerHTML != "No bidder")) {
+                bootbox.alert("You need to enter positive value!",
+                    function () { });
+                return;
+            }
+
+            if (document.getElementById("bidder").innerHTML == "@user")
+                tokensNeeded = tokensToBid;
+            else
+                tokensNeeded += tokensToBid;
+
+            if (tokens < tokensNeeded) {
+                //document.writeln(tokens + "   "  + tokensNeeded);
+                bootbox.alert("You don't have enough tokens!",
+                    function () { });
+                return;
+            }
+            else {
+                window.location.href = '@Url.Action("Create", "Bids")/?numOfTokens=' + tokensToBid + "&auctionId=@Model.Id";
+            }
+
         }
 
     </script>

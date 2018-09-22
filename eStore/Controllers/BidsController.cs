@@ -39,14 +39,20 @@ namespace eStore.Controllers
                 return HttpNotFound();
             }
 
-            if (numOfTokens < 1)
+
+            if (numOfTokens < 0)
             {
                 return HttpNotFound();
                 //return error message
             }
 
-            Auction auction = _context.Auctions.Include(a => a.LastBidder).SingleOrDefault(a => a.Id == auctionId);
+            Auction auction = _context.Auctions.Include(a => a.LastBidder).Include(a => a.User).SingleOrDefault(a => a.Id == auctionId);
             if (auction == null || auction.State != AuctionState.Opened)
+            {
+                return HttpNotFound();
+            }
+
+            if ((numOfTokens == 0) && (auction.LastBidder != null))
             {
                 return HttpNotFound();
             }
@@ -57,21 +63,30 @@ namespace eStore.Controllers
             var userId = User.Identity.GetUserId();
             ApplicationUser user = _context.Users.SingleOrDefault(u => u.Id == userId);
 
-            double tokensNeeded = auction.CurrentPrice / tokenValue;
-            if (auction.LastBidder != null)
-            {
-                tokensNeeded += 1;
-            }
-
-            if (numOfTokens > 1)
-                tokensNeeded += numOfTokens - 1;
-
-            if (user.NumOfTokens < tokensNeeded)
+            if (userId == auction.User.Id)
             {
                 return HttpNotFound();
             }
 
-            Bid lastBid = _context.Bids.LastOrDefault(b => b.Auction.Id == auctionId);
+            double tokensNeeded = auction.CurrentPrice / tokenValue;
+            //if (auction.LastBidder != null)
+            //{
+              //  tokensNeeded += 1;
+            //}
+
+            //if (numOfTokens > 1)
+                //tokensNeeded += numOfTokens - 1;
+
+            tokensNeeded += numOfTokens;
+            if (user.NumOfTokens < tokensNeeded)
+            {
+                if (auction.LastBidder.Id != userId)
+                    return HttpNotFound();
+                else if (user.NumOfTokens < numOfTokens)
+                    return HttpNotFound();
+            }
+
+            Bid lastBid = _context.Bids.Include(b => b.Auction).OrderByDescending(b => b.DateTimeCreated).FirstOrDefault(b => b.Auction.Id == auctionId);
             if (lastBid != null)
             {
                 auction.LastBidder.NumOfTokens += lastBid.NumOfTokens;
@@ -92,7 +107,7 @@ namespace eStore.Controllers
             _context.Bids.Add(bid);
             _context.SaveChanges();
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Auctions", new {id = auctionId });
         }
     }
 }

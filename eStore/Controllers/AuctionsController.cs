@@ -285,7 +285,14 @@ namespace eStore.Controllers
 
         public ActionResult Details(int id)
         {
-            var auction = _context.Auctions.Include(a => a.User).SingleOrDefault(a => a.Id == id);
+            var auction = _context.Auctions.Include(a => a.User).Include(a => a.LastBidder).SingleOrDefault(a => a.Id == id);
+            if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+            {
+                var userId = User.Identity.GetUserId();
+                ViewBag.NumOfTokens = _context.Users.SingleOrDefault(u => u.Id == userId).NumOfTokens;
+                var tokenValue = eStore.fonts.Models.Constants.TokenValue;
+                ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
+            }
 
             if (auction == null)
                 return HttpNotFound();
