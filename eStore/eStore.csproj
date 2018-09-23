@@ -273,6 +273,7 @@
       <DependentUpon>201809211600165_UserMadeNotRequiredBidModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\AppSetting.cs" />
+    <Compile Include="Models\AuctionDetailsModel.cs" />
     <Compile Include="Models\Bid.cs" />
     <Compile Include="Models\Constants.cs" />
     <Compile Include="Models\Settings.cs" />
@@ -592,6 +593,8 @@
     <Content Include="Views\Settings\Index.cshtml" />
     <Content Include="Views\TokenOrders\Create.cshtml" />
     <Content Include="Views\TokenOrders\Index.cshtml" />
+    <Content Include="Views\Auctions\IndexWon.cshtml" />
+    <Content Include="Views\Auctions\IndexMy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

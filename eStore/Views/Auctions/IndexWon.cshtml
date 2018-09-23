@@ -3,11 +3,11 @@
 @using PagedList.Mvc;
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 @{
-    ViewBag.Title = "IndexReady";
+    ViewBag.Title = "IndexWon";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Auction requests</h2>
+<h2>Auctions I Won</h2>
 
 
 @using (Html.BeginForm())
@@ -49,32 +49,31 @@
                 <img class="card-img-top" style="width: 100px; height: 150px; margin-bottom: 5px;" src="@imgDataUrl" alt="Card image">
             </a>
             <div class="card-body">
-                <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
+                <span class="label label-danger" style="margin-bottom: 5px;">@auction.State</span><br />
                 <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice @auction.Currency</span><br />
-                <span class="label label-default" style="margin-bottom: 5px;">@auction.User.Email</span><br />
-                <button class="btn btn-primary" style="margin: 5px;"><a href='@Url.Action("Update", "Auctions", new {id = auction.Id, state = AuctionState.Opened})' style="text-decoration: none; color: white;">Start</a></button>
+                <span class="label label-default" style="margin-bottom: 5px;">@auction.LastBidder.UserName</span><br />
             </div>
         </div>
     </div>
 }
-
 
 <br />
 <div class="row">
     <div class="col-sm-12">
         @if (Model.Count == 0)
         {
-            <h3>There's no such request yet!</h3>
+            <h3>There's no such auction yet!</h3>
         }
         else
         {
             <div>Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount</div>
         }
 
-        @Html.PagedListPager(Model, page => Url.Action("IndexReady",
+        @Html.PagedListPager(Model, page => Url.Action("IndexWon",
             new {page, currentFilter = ViewBag.CurrentFilter}))
     </div>
 </div>
+
 @section scripts
 {
     <script>
@@ -83,6 +82,8 @@
         });
     </script>
 }
+
+
 
 
 

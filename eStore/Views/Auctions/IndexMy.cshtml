@@ -43,15 +43,7 @@
 
 }
 
-<h2>Auctions</h2>
-@if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
-{
-    <div>
-        <div id="tokens" style="float: left;">@ViewBag.NumOfTokens</div>&nbsp;&nbsp;
-        <img src="~/images/token.png" />
-    </div>
-
-}
+<h2>My Auctions</h2>
 
 @using (Html.BeginForm())
 {
@@ -131,44 +123,15 @@
                     <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id name">No bidder</text></span><br />
                 }
 
-                <div id="@auction.Id btn">
-                    @if (Request.IsAuthenticated && auction.State == AuctionState.Opened && !User.IsInRole(RoleName.MaintenanceManager))
-                    {
-                        if (auction.LastBidder != null)
-                        {
-                            if (auction.User.Email != user)
-                            {
-                                <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,1, @ViewBag.TokenValue, @auction.Id)">Bid</button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,1, @ViewBag.TokenValue, @auction.Id)" disabled="disabled">Bid</button>
-                            }
-
-                        }
-                        else
-                        {
-                            if (auction.User.Email != user)
-                            {
-                                <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,0, @ViewBag.TokenValue, @auction.Id)">Bid</button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,0, @ViewBag.TokenValue, @auction.Id)" disabled="disabled">Bid</button>
-                            }
-                        }
-                    }
-                    else
-                    {
-                        <button class="btn btn-primary" style="margin: 5px;" disabled="disabled">Bid</button>
-                    }
-                </div>
+                    
+                <button class="btn btn-primary" style="margin: 5px;" disabled="disabled">Bid</button>
 
 
             </div>
         </div>
     </div>
 }
+
 
 
 <br />
@@ -182,9 +145,10 @@
         {
             <div>Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount</div>
         }
+        
 
-        @Html.PagedListPager(Model, page => Url.Action("Index",
-            new { page, currentFilter = ViewBag.CurrentFilter }))
+        @Html.PagedListPager(Model, page => Url.Action("IndexMy",
+            new {page, currentFilter = ViewBag.CurrentFilter}))
     </div>
 </div>
 
@@ -216,8 +180,6 @@
             var x = setInterval(function () { callBack(id, time, counter); }, 1000);
             array[counter++] = x;
         }
-
-
 
 
         function callBack(id, time, counter) {
@@ -253,63 +215,6 @@
                 document.getElementById(id).innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
             }
             // If the count down is finished, write some text
-        }
-
-
-        function bid(currentPrice, notFirst, tokenValue, auctionId) {
-            notFirst = parseInt(notFirst);
-            tokenValue = parseFloat(tokenValue);
-            var tokens = document.getElementById("tokens").innerHTML;
-            tokens = parseFloat(tokens);
-            currentPrice = parseFloat(currentPrice);
-            var tokensNeeded = (currentPrice / tokenValue) + 1;
-            if (notFirst == 0)
-                tokensNeeded = currentPrice / tokenValue;
-
-            var lastBidder = document.getElementById(auctionId + " name").innerHTML; //added
-            if (lastBidder == "@user")  //added
-                tokensNeeded = 1;  //added
-
-            if (tokens < tokensNeeded) {
-                bootbox.alert("You don't have enough tokens!",
-                    function (result) {
-                        if (result) {
-
-                        }
-                    });
-            } else {
-                tokens = tokens - tokensNeeded;
-                currentPrice = currentPrice + tokenValue;
-                document.getElementById("tokens").innerHTML = tokens + "";
-                if (notFirst == 0)
-                    currentPrice -= tokenValue;
-                document.getElementById(auctionId + " price").innerHTML = currentPrice + "";
-
-                document.getElementById(auctionId + " name").innerHTML = "@user";
-                if (notFirst != 0) {
-                    $.ajax({
-                        type: "GET",
-                        url: "/Bids/Create/?numOfTokens=1&auctionId=" + auctionId,
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        success: function() {
-
-                        }
-                    });
-                } else {
-                    $.ajax({
-                        type: "GET",
-                        url: "/Bids/Create/?numOfTokens=0&auctionId=" + auctionId,
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        success: function () {
-
-                        }
-                    });
-                }
-
-            }
-
         }
 
     </script>

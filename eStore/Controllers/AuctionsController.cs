@@ -62,12 +62,13 @@ namespace eStore.Controllers
 
             if (String.IsNullOrEmpty(state))
             {
-                ViewBag.State = "ALL";
+                ViewBag.State = "All";
             }
             else
             {
                 ViewBag.State = state;
-                auctions = auctions.Where(a => a.State == state);
+                if (state != "All")
+                    auctions = auctions.Where(a => a.State == state);
             }
 
             List<Auction> newList;
@@ -109,9 +110,103 @@ namespace eStore.Controllers
                 ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
             }
             //return View(auctions.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize));
-            return View(PagedListExtensions.ToPagedList(newList.OrderBy(a => a.DateTimeCreated), pageNumber, pageSize));
+            return View(PagedListExtensions.ToPagedList(newList.OrderByDescending(a => a.DateTimeCreated), pageNumber, pageSize));
 
         }
+
+
+        [Authorize]
+        public ActionResult IndexMy(string currentFilter, string searchString, int? lowPrice, int? highPrice, string state, int? page)
+        {
+            if (User.IsInRole(RoleName.MaintenanceManager))
+            {
+                return HttpNotFound();
+            }
+
+            var userId = User.Identity.GetUserId();
+
+            CheckAuctions();  //checks if there are opened auctions that expired
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var auctions = _context.Auctions.Include(a => a.User).Where(a => a.User.Id == userId);
+
+            if (lowPrice != null)
+            {
+                auctions = auctions.Where(a => a.CurrentPrice >= lowPrice);
+            }
+
+            ViewBag.LowPrice = lowPrice;
+
+            if (highPrice != null)
+            {
+                auctions = auctions.Where(a => a.CurrentPrice <= highPrice);
+            }
+
+            ViewBag.HighPrice = highPrice;
+
+            if (String.IsNullOrEmpty(state))
+            {
+                ViewBag.State = "All";
+            }
+            else
+            {
+                ViewBag.State = state;
+                if (state != "All")
+                    auctions = auctions.Where(a => a.State == state);
+            }
+
+            List<Auction> newList;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                newList = new List<Auction>();
+                var words = searchString.Split(' ');
+
+                foreach (var auction in auctions)
+                {
+                    foreach (var word in words)
+                    {
+                        if (auction.Name.ToLower().Contains(word.ToLower()))
+                        {
+                            newList.Add(auction);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                newList = auctions.ToList();
+            }
+
+            int pageSize = 10;
+            var size = _context.AppSettings.SingleOrDefault(s => s.Name == "NumOfItemsPerPage");
+            if (size != null)
+            {
+                pageSize = Int32.Parse(size.Value);
+            }
+
+            int pageNumber = (page ?? 1);
+            if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+            {
+                //var userId = User.Identity.GetUserId();
+                ViewBag.NumOfTokens = _context.Users.SingleOrDefault(u => u.Id == userId).NumOfTokens;
+                var tokenValue = eStore.fonts.Models.Constants.TokenValue;
+                ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
+            }
+            //return View(auctions.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize));
+            return View(PagedListExtensions.ToPagedList(newList.OrderByDescending(a => a.DateTimeCreated), pageNumber, pageSize));
+
+        }
+
 
         private void CheckAuctions()
         {
@@ -223,6 +318,84 @@ namespace eStore.Controllers
             return View(PagedListExtensions.ToPagedList(newList.OrderBy(a => a.DateTimeCreated), pageNumber, pageSize));
         }
 
+
+
+        [Authorize]
+        public ActionResult IndexWon(string currentFilter, string searchString, int? lowPrice, int? highPrice, int? page)
+        {
+            if (User.IsInRole(RoleName.MaintenanceManager))
+            {
+                return HttpNotFound();
+            }
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var userId = User.Identity.GetUserId();
+            var auctions = _context.Auctions.
+                Include(a => a.User).
+                Include(a => a.LastBidder).
+                Where(a => a.LastBidder.Id == userId).
+                Where(a => a.State == AuctionState.Completed);
+
+            if (lowPrice != null)
+            {
+                auctions = auctions.Where(a => a.CurrentPrice >= lowPrice);
+            }
+
+            ViewBag.LowPrice = lowPrice;
+
+            if (highPrice != null)
+            {
+                auctions = auctions.Where(a => a.CurrentPrice <= highPrice);
+            }
+
+            ViewBag.HighPrice = highPrice;
+
+            List<Auction> newList;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                newList = new List<Auction>();
+                var words = searchString.Split(' ');
+
+                foreach (var auction in auctions)
+                {
+                    foreach (var word in words)
+                    {
+                        if (auction.Name.ToLower().Contains(word.ToLower()))
+                        {
+                            newList.Add(auction);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                newList = auctions.ToList();
+            }
+
+            int pageSize = 10;
+            var size = _context.AppSettings.SingleOrDefault(s => s.Name == "NumOfItemsPerPage");
+            if (size != null)
+            {
+                pageSize = Int32.Parse(size.Value);
+            }
+            int pageNumber = (page ?? 1);
+
+            return View(PagedListExtensions.ToPagedList(newList.OrderByDescending(a => a.DateTimeCreated), pageNumber, pageSize));
+        }
+
+
+
         [Authorize(Roles = RoleName.MaintenanceManager)]
         public ActionResult Update(int id, string state)
         {
@@ -271,20 +444,17 @@ namespace eStore.Controllers
             auction.Currency = CurrentCurrency();
 
             _context.Auctions.Add(auction);
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (DbEntityValidationException e)
-            {
-                Console.WriteLine(e);
-            }
 
-            return View("Details", auction);
+            _context.SaveChanges();
+           
+            
+
+            return RedirectToAction("Details", new { id = auction.Id});
         }
 
         public ActionResult Details(int id)
         {
+            AuctionDetailsModel model = new AuctionDetailsModel();
             var auction = _context.Auctions.Include(a => a.User).Include(a => a.LastBidder).SingleOrDefault(a => a.Id == id);
             if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
             {
@@ -296,8 +466,13 @@ namespace eStore.Controllers
 
             if (auction == null)
                 return HttpNotFound();
-
-            return View(auction);
+            model.Auction = auction;
+            model.Bids = _context.Bids.
+                Include(b => b.Auction).
+                Where(b => b.Auction.Id == auction.Id).
+                OrderBy(b => b.DateTimeCreated).
+                ToList();
+            return View(model);
         }
 
         public string CurrentCurrency()

@@ -41,6 +41,9 @@
                                 else if (Request.IsAuthenticated)
                                 {
                                     <li>
+                                        @Html.ActionLink("Won", "IndexWon", "Auctions")
+                                    </li>
+                                    <li>
                                         @Html.ActionLink("My auctions", "IndexMy", "Auctions")
                                     </li>
                                     <li>

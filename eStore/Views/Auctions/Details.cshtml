@@ -3,7 +3,7 @@
 @using Microsoft.Ajax.Utilities
 @using HtmlHelper = System.Web.WebPages.Html.HtmlHelper
 @using Microsoft.AspNet.Identity;
-@model eStore.Models.Auction
+@model eStore.Models.AuctionDetailsModel
 @{
     ViewBag.Title = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -31,12 +31,12 @@
 <div class="row">
     <div class="col-sm-4">
         @{
-            string imreBase64Data = Convert.ToBase64String(@Model.Image);
+            string imreBase64Data = Convert.ToBase64String(@Model.Auction.Image);
             string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
             long time = 0;
-            if (Model.State == AuctionState.Opened)
+            if (Model.Auction.State == AuctionState.Opened)
             {
-                time = (long)(((DateTime)Model.DateTimeOpened).Ticks - DateTime.Now.Ticks) / TimeSpan.TicksPerMillisecond + Model.Duration * 1000;
+                time = (long)(((DateTime)Model.Auction.DateTimeOpened).Ticks - DateTime.Now.Ticks) / TimeSpan.TicksPerMillisecond + Model.Auction.Duration * 1000;
             }
         }
         <img src="@imgDataUrl" style="width:100%" />
@@ -44,49 +44,49 @@
     <div class="col-sm-8">
         <table class="table table-dark table-hover table-striped table-bordered">
             <tr>
-                <td>@Html.DisplayNameFor(m => m.Name)</td>
-                <td>@Model.Name</td>
+                <td>@Html.DisplayNameFor(m => m.Auction.Name)</td>
+                <td>@Model.Auction.Name</td>
             </tr>
             <tr>
                 <td>Owner</td>
-                <td>@Model.User.Email</td>
+                <td>@Model.Auction.User.Email</td>
             </tr>
             <tr>
                 <td>State</td>
                 <td>
-                    @if (Model.State == AuctionState.Ready)
+                    @if (Model.Auction.State == AuctionState.Ready)
                     {
-                        <span class="label label-default">@Model.State</span>
+                        <span class="label label-default">@Model.Auction.State</span>
                     }
-                    else if (Model.State == AuctionState.Opened)
+                    else if (Model.Auction.State == AuctionState.Opened)
                     {
-                        <span class="label label-success">@Model.State</span>
+                        <span class="label label-success">@Model.Auction.State</span>
                     }
                     else
                     {
-                        <span class="label label-danger">@Model.State</span>
+                        <span class="label label-danger">@Model.Auction.State</span>
                     }
 
                 </td>
             </tr>
-            @if (Model.State == AuctionState.Opened)
+            @if (Model.Auction.State == AuctionState.Opened)
             {
                 <tr>
                     <td>Remaining time:</td>
-                    <td><text id="@Model.Id" time="@time"></text></td>
+                    <td><text id="@Model.Auction.Id" time="@time"></text></td>
                 </tr>
             }
             <tr>
                 <td>Current price</td>
-                <td id="price">@Model.CurrentPrice @Model.Currency</td>
+                <td id="price">@Model.Auction.CurrentPrice @Model.Auction.Currency</td>
             </tr>
             <tr>
                 <td>
                     Last bidder:
                 </td>
-                @if (Model.LastBidder != null)
+                @if (Model.Auction.LastBidder != null)
                 {
-                    <td id="bidder">@Model.LastBidder.UserName</td>
+                    <td id="bidder">@Model.Auction.LastBidder.UserName</td>
                 }
                 else
                 {
@@ -95,34 +95,66 @@
             </tr>
         </table>
 
-        @if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager) && (userId != Model.User.Id))
+        @if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager) && (userId != Model.Auction.User.Id))
         {
-                <div class="row">
-                    <div class="col-sm-3 form-group">
-                        @Html.Label("Number of tokens")
-                        @Html.TextBox("numOfTokens", "", new { placeholder = "", @class = "form-control" })
-                    </div>
-                    @Html.Hidden("auctionId", Model.Id)
-                    <div class="col-sm-1 form-group">
-                        @Html.Label("   ")
-                        <button class="btn btn-primary" onclick="bid(@Model.CurrentPrice)">Bid</button>
-                    </div>
+            <div class="row">
+                <div class="col-sm-3 form-group">
+                    @Html.Label("Number of tokens")
+                    @Html.TextBox("numOfTokens", "", new { placeholder = "", @class = "form-control" })
                 </div>
+                @Html.Hidden("auctionId", Model.Auction.Id)
+                <div class="col-sm-1 form-group">
+                    @Html.Label("   ")
+                    <button class="btn btn-primary" onclick="bid(@Model.Auction.CurrentPrice)">Bid</button>
+                </div>
+            </div>
         }
     </div>
 </div>
 
+<hr />
+
 <div class="row">
-    <div class="col-sm-4">
-        
-    </div>
+    <div class="col-sm-12"><button data-toggle="collapse" data-target="#clps" class="btn btn-primary" style="margin-bottom: 20px;">Show bids history</button></div>
+</div> 
+<div class="row collapse" id="clps">
+    @if (Model.Bids.Count > 0)
+    {
+        <div class="col-sm-12">
+            <table id="bids" class="table table-hover table-striped" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th>Created on</th>
+                    <th>User</th>
+                    <th>Number of tokens</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var bid in Model.Bids)
+                {
+                    <tr>
+                        <td>@bid.DateTimeCreated</td>
+                        <td>@bid.User.Email</td>
+                        <td>@bid.NumOfTokens</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <h4 style="margin-left: 15px;">There are no bids!</h4>
+    }
 </div>
+
 
 
 @section scripts
 {
     <script>
         $(window).ready(function () {
+            $('#bids').DataTable();
             $(".active a").css("background-color", "#df691a");
             $("td text").each(function () {
                 timer($(this).attr("id"), $(this).attr("time"));
@@ -219,7 +251,7 @@
                 return;
             }
             else {
-                window.location.href = '@Url.Action("Create", "Bids")/?numOfTokens=' + tokensToBid + "&auctionId=@Model.Id";
+                window.location.href = '@Url.Action("Create", "Bids")/?numOfTokens=' + tokensToBid + "&auctionId=@Model.Auction.Id";
             }
 
         }
