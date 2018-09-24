@@ -469,6 +469,7 @@ namespace eStore.Controllers
             model.Auction = auction;
             model.Bids = _context.Bids.
                 Include(b => b.Auction).
+                Include(b => b.User).
                 Where(b => b.Auction.Id == auction.Id).
                 OrderBy(b => b.DateTimeCreated).
                 ToList();

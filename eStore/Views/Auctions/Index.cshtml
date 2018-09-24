@@ -121,7 +121,7 @@
                     <br />
                 }
 
-                <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id price">@auction.CurrentPrice @auction.Currency</span><br />
+                <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id price">@auction.CurrentPrice</text><text> @auction.Currency</text></span><br />
                 @if (auction.LastBidder != null)
                 {
                     <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id name">@auction.LastBidder.Email</text></span><br />
@@ -190,6 +190,21 @@
 
 @section scripts
 {
+    <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
+    <script src="~/signalr/js"></script>
+    
+    <script>
+        var myHub = $.connection.hub.start();
+
+        $.connection.hub.disconnected(function () {
+
+            setTimeout(function () {
+                myHub = $.connection.hub.start();
+                console.log("disconnected");
+            }, 5000);
+        });
+    </script>
+
     <script>
         $(window).ready(function () {
             $(".active a").css("background-color", "#df691a");
@@ -283,9 +298,9 @@
                 document.getElementById("tokens").innerHTML = tokens + "";
                 if (notFirst == 0)
                     currentPrice -= tokenValue;
-                document.getElementById(auctionId + " price").innerHTML = currentPrice + "";
+                //document.getElementById(auctionId + " price").innerHTML = currentPrice + "";
 
-                document.getElementById(auctionId + " name").innerHTML = "@user";
+                //document.getElementById(auctionId + " name").innerHTML = "@user";
                 if (notFirst != 0) {
                     $.ajax({
                         type: "GET",
@@ -310,6 +325,11 @@
 
             }
 
+        }
+
+        function updatePriceAndBidder(newPrice, newBidder, auctionId) {
+            document.getElementById(auctionId + " price").innerHTML = newPrice + "";
+            document.getElementById(auctionId + " name").innerHTML = newBidder + "";
         }
 
     </script>

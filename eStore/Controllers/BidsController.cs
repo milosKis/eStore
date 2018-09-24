@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using eStore.Models;
 using Microsoft.AspNet.Identity;
 using System.Data.Entity;
+using eStore.Hubs;
 
 namespace eStore.Controllers
 {
@@ -106,6 +107,9 @@ namespace eStore.Controllers
 
             _context.Bids.Add(bid);
             _context.SaveChanges();
+
+            var hub = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<MyHub>();
+            hub.Clients.All.updatePriceAndBidder(auction.CurrentPrice, user.Email, auction.Id);
 
             return RedirectToAction("Details", "Auctions", new {id = auctionId });
         }
