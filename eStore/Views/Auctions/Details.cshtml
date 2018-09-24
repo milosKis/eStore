@@ -53,7 +53,7 @@
             </tr>
             <tr>
                 <td>State</td>
-                <td>
+                <td id="state">
                     @if (Model.Auction.State == AuctionState.Ready)
                     {
                         <span class="label label-default">@Model.Auction.State</span>
@@ -78,7 +78,7 @@
             }
             <tr>
                 <td>Current price</td>
-                <td id="price">@Model.Auction.CurrentPrice @Model.Auction.Currency</td>
+                <td><text id="@Model.Auction.Id price">@Model.Auction.CurrentPrice</text><text> @Model.Auction.Currency</text></td>
             </tr>
             <tr>
                 <td>
@@ -86,17 +86,15 @@
                 </td>
                 @if (Model.Auction.LastBidder != null)
                 {
-                    <td id="bidder">@Model.Auction.LastBidder.UserName</td>
+                    <td id="@Model.Auction.Id name">@Model.Auction.LastBidder.UserName</td>
                 }
                 else
                 {
-                    <td id="bidder">No bidder</td>
+                    <td id="@Model.Auction.Id name">No bidder</td>
                 }
             </tr>
         </table>
 
-        @if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager) && (userId != Model.Auction.User.Id))
-        {
             <div class="row">
                 <div class="col-sm-3 form-group">
                     @Html.Label("Number of tokens")
@@ -105,10 +103,21 @@
                 @Html.Hidden("auctionId", Model.Auction.Id)
                 <div class="col-sm-1 form-group">
                     @Html.Label("   ")
-                    <button class="btn btn-primary" onclick="bid(@Model.Auction.CurrentPrice)">Bid</button>
+                    <div id="btn">
+                        @if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager) && (userId != Model.Auction.User.Id) && (@Model.Auction.State == AuctionState.Opened))
+                        {
+
+                            <button class="btn btn-primary" onclick="bid(@Model.Auction.CurrentPrice)">Bid</button>
+
+
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" disabled="disabled">Bid</button>
+                        }
+                    </div>
                 </div>
             </div>
-        }
     </div>
 </div>
 
@@ -116,47 +125,90 @@
 
 <div class="row">
     <div class="col-sm-12"><button data-toggle="collapse" data-target="#clps" class="btn btn-primary" style="margin-bottom: 20px;">Show bids history</button></div>
-</div> 
+</div>
 <div class="row collapse" id="clps">
-    @if (Model.Bids.Count > 0)
-    {
-        <div class="col-sm-12">
-            <table id="bids" class="table table-hover table-striped" style="width: 100%;">
-                <thead>
+    
+    <h4 style="margin-left: 15px;" id="zeroBids"></h4>
+    
+    <div class="col-sm-12">
+        <table id="bids" class="table table-hover table-striped" style="width: 100%;" hidden>
+            <thead>
                 <tr>
                     <th>Created on</th>
                     <th>User</th>
                     <th>Number of tokens</th>
                 </tr>
-                </thead>
-                <tbody>
+            </thead>
+            <tbody>
                 @foreach (var bid in Model.Bids)
                 {
                     <tr>
-                        <td>@bid.DateTimeCreated</td>
+                        <td>@bid.DateTimeCreated.ToString()</td>
                         <td>@bid.User.Email</td>
                         <td>@bid.NumOfTokens</td>
                     </tr>
                 }
-                </tbody>
-            </table>
-        </div>
-    }
-    else
-    {
-        <h4 style="margin-left: 15px;">There are no bids!</h4>
-    }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 
 
 @section scripts
 {
+    <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
+    <script src="~/signalr/js"></script>
+
+    <script>
+        var myHub = $.connection.hub.start();
+
+        $.connection.hub.disconnected(function () {
+
+            setTimeout(function () {
+                myHub = $.connection.hub.start();
+                console.log("disconnected");
+            }, 5000);
+        });
+
+        $.connection.myHub.client.updatePriceAndBidder = function (newPrice, newBidder, auctionId) {
+            var priceField = document.getElementById(auctionId + " price");
+            if (priceField != null)
+                priceField.innerHTML = newPrice;
+
+            var nameField = document.getElementById(auctionId + " name");
+            if (nameField != null)
+                nameField.innerHTML = newBidder;
+        };
+
+        $.connection.myHub.client.updateBidList = function (date, user, numOfTokens, auctionId) {
+            var priceField = document.getElementById(auctionId + " price");
+            if (priceField == null)
+                return;
+
+            $('#bids').removeAttr("hidden");
+            document.getElementById("zeroBids").innerHTML = "";
+            var table = $("#bids").DataTable();//document.getElementById("bids");
+
+            table.row.add( [
+                date,
+                user,
+                numOfTokens
+            ]).draw(false);
+
+            $("#bids").DataTable();
+        }
+    </script>
     <script>
         $(window).ready(function () {
-            $('#bids').DataTable();
+            if (@Model.Bids.Count > 0) {
+                $('#bids').removeAttr("hidden");
+                $('#bids').DataTable();
+            } else {
+                document.getElementById("zeroBids").innerHTML = "There are no bids!";
+            }
             $(".active a").css("background-color", "#df691a");
-            $("td text").each(function () {
+            $("td text[time]").each(function () {
                 timer($(this).attr("id"), $(this).attr("time"));
             });
         });
@@ -169,7 +221,10 @@
         function timer(id, time) {
             // Update the count down every 1 second
             if (time.charAt(0) == '-') {
-                document.getElementById(id).innerHTML = "EXPIRED";
+                document.getElementById(id).innerHTML = "";
+                document.getElementById(id).innerHTML = "";
+                document.getElementById("state").innerHTML = "<span class='label label-danger' style='margin-bottom: 5px;' >COMPLETED</span><br />";
+                document.getElementById("btn").innerHTML = "<button class='btn btn-primary' style='margin: 5px;' disabled='disabled'>Bid</button>";
                 return;
             }
             time = parseInt(time);
@@ -190,7 +245,9 @@
             var distance = time - now;
             if (distance <= 0) {
                 clearInterval(counter);
-                document.getElementById(id).innerHTML = "EXPIRED";
+                document.getElementById(id).innerHTML = "";
+                document.getElementById("state").innerHTML = "<span class='label label-danger' style='margin-bottom: 5px;' >COMPLETED</span><br />";
+                document.getElementById("btn").innerHTML = "<button class='btn btn-primary' style='margin: 5px;' disabled='disabled'>Bid</button>";
                 return;
             } else {
                 // Time calculations for days, hours, minutes and seconds
@@ -233,13 +290,13 @@
                     function () { });
                 return;
             }
-            else if ((tokensToBid == 0) && (document.getElementById("bidder").innerHTML != "No bidder")) {
+            else if ((tokensToBid == 0) && (document.getElementById("@Model.Auction.Id name").innerHTML != "No bidder")) {
                 bootbox.alert("You need to enter positive value!",
                     function () { });
                 return;
             }
 
-            if (document.getElementById("bidder").innerHTML == "@user")
+            if (document.getElementById("@Model.Auction.Id name").innerHTML == "@user")
                 tokensNeeded = tokensToBid;
             else
                 tokensNeeded += tokensToBid;
@@ -251,7 +308,17 @@
                 return;
             }
             else {
-                window.location.href = '@Url.Action("Create", "Bids")/?numOfTokens=' + tokensToBid + "&auctionId=@Model.Auction.Id";
+                document.getElementById("tokens").innerHTML = tokens - tokensToBid;
+                //window.location.href = '@Url.Action("Create", "Bids")/?numOfTokens=' + tokensToBid + "&auctionId=@Model.Auction.Id";
+                $.ajax({
+                    type: "GET",
+                    url: "/Bids/Create/?numOfTokens=" + tokensToBid + "&auctionId=" + "@Model.Auction.Id",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function () {
+
+                    }
+                });
             }
 
         }

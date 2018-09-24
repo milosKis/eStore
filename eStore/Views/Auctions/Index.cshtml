@@ -203,6 +203,16 @@
                 console.log("disconnected");
             }, 5000);
         });
+
+        $.connection.myHub.client.updatePriceAndBidder = function(newPrice, newBidder, auctionId) {
+            var priceField = document.getElementById(auctionId + " price");
+            if (priceField != null)
+                priceField.innerHTML = newPrice;
+
+            var nameField = document.getElementById(auctionId + " name");
+            if (nameField != null)
+                nameField.innerHTML = newBidder;
+        };
     </script>
 
     <script>
@@ -327,10 +337,7 @@
 
         }
 
-        function updatePriceAndBidder(newPrice, newBidder, auctionId) {
-            document.getElementById(auctionId + " price").innerHTML = newPrice + "";
-            document.getElementById(auctionId + " name").innerHTML = newBidder + "";
-        }
+        
 
     </script>
 }

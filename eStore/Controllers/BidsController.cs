@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using eStore.Models;
 using Microsoft.AspNet.Identity;
 using System.Data.Entity;
+using System.Web.Optimization;
+using DotNetNuke.Common.Utilities;
 using eStore.Hubs;
 
 namespace eStore.Controllers
@@ -110,6 +112,7 @@ namespace eStore.Controllers
 
             var hub = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<MyHub>();
             hub.Clients.All.updatePriceAndBidder(auction.CurrentPrice, user.Email, auction.Id);
+            hub.Clients.All.updateBidList(string.Format("{0:dd-MMM-yy hh:mm:ss tt}", bid.DateTimeCreated), user.Email, bid.NumOfTokens, auction.Id);
 
             return RedirectToAction("Details", "Auctions", new {id = auctionId });
         }
