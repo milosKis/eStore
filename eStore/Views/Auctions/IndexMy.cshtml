@@ -94,24 +94,29 @@
                 <img class="card-img-top" style="width: 100px; height: 150px; margin-bottom: 5px;" src="@imgDataUrl" alt="Card image">
             </a>
             <div class="card-body">
-                @if (auction.State == AuctionState.Completed)
-                {
-                    <span class="label label-danger" style="margin-bottom: 5px;">@auction.State</span><br />
-                    <br />
-                }
-                else if (auction.State == AuctionState.Opened)
-                {
-                    <div id="@auction.Id state">
+                <div id="@auction.Id state">
+                    @if (auction.State == AuctionState.Completed)
+                    {
+                        <span class="label label-danger" style="margin-bottom: 5px;">@auction.State</span><br />
+                    }
+                    else if (auction.State == AuctionState.Opened)
+                    {
                         <span class="label label-success" style="margin-bottom: 5px;">@auction.State</span><br />
-                    </div>
-
-                    <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id" time="@time"></text></span><br />
+                    }
+                    else
+                    {
+                        <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
+                    }
+                </div>
+                @if (auction.State == AuctionState.Opened)
+                {
+                    <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id" time="@time"></text></span>
                 }
                 else
                 {
-                    <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
-                    <br />
+                    <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id"></text></span>
                 }
+                <br />
 
                 <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id price">@auction.CurrentPrice @auction.Currency</span><br />
                 @if (auction.LastBidder != null)
@@ -123,7 +128,7 @@
                     <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id name">No bidder</text></span><br />
                 }
 
-                    
+
                 <button class="btn btn-primary" style="margin: 5px;" disabled="disabled">Bid</button>
 
 
@@ -145,7 +150,7 @@
         {
             <div>Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount</div>
         }
-        
+
 
         @Html.PagedListPager(Model, page => Url.Action("IndexMy",
             new {page, currentFilter = ViewBag.CurrentFilter}))
@@ -154,6 +159,39 @@
 
 @section scripts
 {
+    <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
+    <script src="~/signalr/js"></script>
+
+    <script>
+        var myHub = $.connection.hub.start();
+
+        $.connection.hub.disconnected(function () {
+
+            setTimeout(function () {
+                myHub = $.connection.hub.start();
+                console.log("disconnected");
+            }, 5000);
+        });
+
+        $.connection.myHub.client.updatePriceAndBidder = function(newPrice, newBidder, auctionId) {
+            var priceField = document.getElementById(auctionId + " price");
+            if (priceField != null)
+                priceField.innerHTML = newPrice;
+
+            var nameField = document.getElementById(auctionId + " name");
+            if (nameField != null)
+                nameField.innerHTML = newBidder;
+        };
+
+        $.connection.myHub.client.updateStateAndTimer = function(auctionId, time, userId) {
+            var stateField = document.getElementById(auctionId + " state");
+            if (stateField != null) {
+                stateField.innerHTML = "<span class='label label-success' style='margin-bottom: 5px;' >OPENED</span><br />"
+                timer(auctionId, time + "");
+            }
+        }
+    </script>
+
     <script>
         $(window).ready(function () {
             $(".active a").css("background-color", "#df691a");

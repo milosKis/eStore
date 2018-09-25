@@ -11,6 +11,7 @@ using System.Data.Entity;
 using Microsoft.Ajax.Utilities;
 using PagedList;
 using eStore.Models;
+using eStore.Hubs;
 
 namespace eStore.Controllers
 {
@@ -137,7 +138,10 @@ namespace eStore.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var auctions = _context.Auctions.Include(a => a.User).Where(a => a.User.Id == userId);
+            var auctions = _context.Auctions.
+                Include(a => a.User).
+                Include(a => a.LastBidder).
+                Where(a => a.User.Id == userId);
 
             if (lowPrice != null)
             {
@@ -220,9 +224,10 @@ namespace eStore.Controllers
                     if (auction.LastBidder != null)
                     {
                         string title = "Auction win!";
-                        string message = $"Congratulations! You have won the auction " + auction.Name + " " + auction.Id + "!";
+                        string message = "Congratulations! You have won the " + auction.Name + "(id = " + auction.Id + ")!";
                         string email = auction.LastBidder.Email;
                         //this is place for code that actually sends email
+               //        Email.Send(email, title, message);
                     }
 
                     _context.SaveChanges();
@@ -234,9 +239,9 @@ namespace eStore.Controllers
         }
 
 
-        public void CompleteAuction(int id)
+        /*public void CompleteAuction(int id)
         {
-            Auction auction = _context.Auctions.SingleOrDefault(a => a.Id == id);
+            Auction auction = _context.Auctions.Include(a => a.LastBidder).SingleOrDefault(a => a.Id == id);
             if (auction != null)
             {
                 auction.DateTimeClosed = DateTime.Now;
@@ -244,14 +249,14 @@ namespace eStore.Controllers
                 if (auction.LastBidder != null)
                 {
                     string title = "Auction win!";
-                    string message = $"Congratulations! You have won the auction " + auction.Name + " " + auction.Id + "!";
+                    string message = "Congratulations! You have won the " + auction.Name + "(id = " + auction.Id + ")!";
                     string email = auction.LastBidder.Email;
-                    //this is place for code that actually sends email
+                    Email.Send(auction.LastBidder.Email, title, message);
                 }
 
                 _context.SaveChanges();
             }
-        }
+        }*/
 
 
         [Authorize(Roles = RoleName.MaintenanceManager)]
@@ -327,6 +332,8 @@ namespace eStore.Controllers
             {
                 return HttpNotFound();
             }
+
+            CheckAuctions();
 
             if (searchString != null)
             {
@@ -405,7 +412,10 @@ namespace eStore.Controllers
             auction.State = state;
             auction.DateTimeOpened = DateTime.Now;
              _context.SaveChanges();
-            
+            var hub = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<MyHub>();
+            long time = (long)(((DateTime)auction.DateTimeOpened).Ticks - DateTime.Now.Ticks) / TimeSpan.TicksPerMillisecond + auction.Duration * 1000;
+            hub.Clients.All.updateStateAndTimer(auction.Id, time, auction.User.Id);
+
             return RedirectToAction("IndexReady", "Auctions");
         }
 
@@ -454,6 +464,7 @@ namespace eStore.Controllers
 
         public ActionResult Details(int id)
         {
+            CheckAuctions();
             AuctionDetailsModel model = new AuctionDetailsModel();
             var auction = _context.Auctions.Include(a => a.User).Include(a => a.LastBidder).SingleOrDefault(a => a.Id == id);
             if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))

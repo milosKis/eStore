@@ -89,7 +89,7 @@ namespace eStore.Controllers
                     return HttpNotFound();
             }
 
-            Bid lastBid = _context.Bids.Include(b => b.Auction).OrderByDescending(b => b.DateTimeCreated).FirstOrDefault(b => b.Auction.Id == auctionId);
+            Bid lastBid = _context.Bids.Include(b => b.Auction).Include(b => b.User).OrderByDescending(b => b.DateTimeCreated).FirstOrDefault(b => b.Auction.Id == auctionId);
             if (lastBid != null)
             {
                 auction.LastBidder.NumOfTokens += lastBid.NumOfTokens;
@@ -113,7 +113,21 @@ namespace eStore.Controllers
             var hub = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<MyHub>();
             hub.Clients.All.updatePriceAndBidder(auction.CurrentPrice, user.Email, auction.Id);
             hub.Clients.All.updateBidList(string.Format("{0:dd-MMM-yy hh:mm:ss tt}", bid.DateTimeCreated), user.Email, bid.NumOfTokens, auction.Id);
-
+            if (lastBid != null)
+            {
+                if (lastBid.User.Id != userId)
+                {
+                    hub.Clients.All.updateNumOfTokens(lastBid.User.Id, lastBid.NumOfTokens);
+                    hub.Clients.All.updateNumOfTokens(userId, tokensNeeded * (-1));
+                }
+                else
+                    hub.Clients.All.updateNumOfTokens(lastBid.User.Id, lastBid.NumOfTokens - tokensNeeded);
+            }
+            else
+            {
+                hub.Clients.All.updateNumOfTokens(userId, tokensNeeded * (-1));
+            }
+                
             return RedirectToAction("Details", "Auctions", new {id = auctionId });
         }
     }

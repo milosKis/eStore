@@ -279,10 +279,15 @@
     <Compile Include="Migrations\201809211600165_UserMadeNotRequiredBidModel.Designer.cs">
       <DependentUpon>201809211600165_UserMadeNotRequiredBidModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809251705293_SeedManager.cs" />
+    <Compile Include="Migrations\201809251705293_SeedManager.Designer.cs">
+      <DependentUpon>201809251705293_SeedManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AppSetting.cs" />
     <Compile Include="Models\AuctionDetailsModel.cs" />
     <Compile Include="Models\Bid.cs" />
     <Compile Include="Models\Constants.cs" />
+    <Compile Include="Models\Email.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\TokenOrder.cs" />
     <Compile Include="Models\TokenOrderState.cs" />
@@ -482,6 +487,14 @@
     </Content>
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\common.scss" />
+    <None Include="Properties\PublishProfiles\km150066d - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\km150066d - FTP1.pubxml" />
+    <None Include="Properties\PublishProfiles\km150066d - FTP2.pubxml" />
+    <None Include="Properties\PublishProfiles\km150066d - FTP3.pubxml" />
+    <None Include="Properties\PublishProfiles\km150066d - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\km150066d - Web Deploy1.pubxml" />
+    <None Include="Properties\PublishProfiles\km150066d - Web Deploy2.pubxml" />
+    <None Include="Properties\PublishProfiles\km150066d - Web Deploy3.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -566,7 +579,9 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Views\Web.config" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
@@ -697,6 +712,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809211600165_UserMadeNotRequiredBidModel.resx">
       <DependentUpon>201809211600165_UserMadeNotRequiredBidModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809251705293_SeedManager.resx">
+      <DependentUpon>201809251705293_SeedManager.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

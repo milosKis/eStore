@@ -40,7 +40,7 @@ namespace eStore.Models
         public DbSet<TokenOrder> TokenOrders { get; set; }
 
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("km150066d", throwIfV1Schema: false)
         {
         }
 

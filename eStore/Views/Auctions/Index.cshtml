@@ -47,7 +47,7 @@
 @if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
 {
     <div>
-        <div id="tokens" style="float: left;">@ViewBag.NumOfTokens</div>&nbsp;&nbsp;
+        <div id="@userId tokens" style="float: left;">@ViewBag.NumOfTokens</div>&nbsp;&nbsp;
         <img src="~/images/token.png" />
     </div>
 
@@ -102,24 +102,29 @@
                 <img class="card-img-top" style="width: 100px; height: 150px; margin-bottom: 5px;" src="@imgDataUrl" alt="Card image">
             </a>
             <div class="card-body">
-                @if (auction.State == AuctionState.Completed)
-                {
-                    <span class="label label-danger" style="margin-bottom: 5px;">@auction.State</span><br />
-                    <br />
-                }
-                else if (auction.State == AuctionState.Opened)
-                {
-                    <div id="@auction.Id state">
+                <div id="@auction.Id state">
+                    @if (auction.State == AuctionState.Completed)
+                    {
+                        <span class="label label-danger" style="margin-bottom: 5px;">@auction.State</span><br />
+                    }
+                    else if (auction.State == AuctionState.Opened)
+                    {
                         <span class="label label-success" style="margin-bottom: 5px;">@auction.State</span><br />
-                    </div>
-
-                    <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id" time="@time"></text></span><br />
+                    }
+                    else
+                    {
+                        <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
+                    }
+                </div>
+                @if (auction.State == AuctionState.Opened)
+                {
+                    <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id" time="@time"></text></span>
                 }
                 else
                 {
-                    <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
-                    <br />
+                    <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id"></text></span>
                 }
+                <br/>
 
                 <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id price">@auction.CurrentPrice</text><text> @auction.Currency</text></span><br />
                 @if (auction.LastBidder != null)
@@ -138,11 +143,11 @@
                         {
                             if (auction.User.Email != user)
                             {
-                                <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,1, @ViewBag.TokenValue, @auction.Id)">Bid</button>
+                                <button class="btn btn-primary" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,1, @ViewBag.TokenValue, @auction.Id)">Bid</button>
                             }
                             else
                             {
-                                <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,1, @ViewBag.TokenValue, @auction.Id)" disabled="disabled">Bid</button>
+                                <button class="btn btn-primary" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,1, @ViewBag.TokenValue, @auction.Id)" disabled="disabled">Bid</button>
                             }
 
                         }
@@ -150,11 +155,11 @@
                         {
                             if (auction.User.Email != user)
                             {
-                                <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,0, @ViewBag.TokenValue, @auction.Id)">Bid</button>
+                                <button class="btn btn-primary" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,0, @ViewBag.TokenValue, @auction.Id)">Bid</button>
                             }
                             else
                             {
-                                <button class="btn btn-primary" id="@auction.Id btn" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,0, @ViewBag.TokenValue, @auction.Id)" disabled="disabled">Bid</button>
+                                <button class="btn btn-primary" style="margin: 5px;" onclick="bid(@auction.CurrentPrice,0, @ViewBag.TokenValue, @auction.Id)" disabled="disabled">Bid</button>
                             }
                         }
                     }
@@ -213,6 +218,25 @@
             if (nameField != null)
                 nameField.innerHTML = newBidder;
         };
+
+        $.connection.myHub.client.updateNumOfTokens = function(userId, numOfTokens)
+        {
+            var tokens = document.getElementById(userId + " tokens");
+            if (tokens != null)
+                tokens.innerHTML = parseFloat(tokens.innerHTML) + numOfTokens;
+        }
+
+        $.connection.myHub.client.updateStateAndTimer = function(auctionId, time, userId) {
+            var stateField = document.getElementById(auctionId + " state");
+            if (stateField != null) {
+                stateField.innerHTML = "<span class='label label-success' style='margin-bottom: 5px;' >OPENED</span><br />"
+                var True = "@Request.IsAuthenticated";
+                var False = "@User.IsInRole(RoleName.MaintenanceManager)";
+                if ( (True == "True" ) && (False == "False") && ("@userId" != userId))
+                    document.getElementById(auctionId + " btn").innerHTML = "<button class='btn btn-primary' id='" + auctionId + " btn' style='margin: 5px;' onclick='bid(0,0, @ViewBag.TokenValue," + auctionId + ")'>Bid</button>";
+                timer(auctionId, time + "");
+            }
+        }
     </script>
 
     <script>
@@ -282,11 +306,14 @@
 
 
         function bid(currentPrice, notFirst, tokenValue, auctionId) {
-            notFirst = parseInt(notFirst);
+            if (document.getElementById(auctionId + " name").innerHTML != "No bidder")
+                notFirst = 1;
+            else
+                notFirst = 0;
             tokenValue = parseFloat(tokenValue);
-            var tokens = document.getElementById("tokens").innerHTML;
+            var tokens = document.getElementById("@userId tokens").innerHTML;
             tokens = parseFloat(tokens);
-            currentPrice = parseFloat(currentPrice);
+            currentPrice = parseFloat(document.getElementById(auctionId + " price").innerHTML);
             var tokensNeeded = (currentPrice / tokenValue) + 1;
             if (notFirst == 0)
                 tokensNeeded = currentPrice / tokenValue;
@@ -305,7 +332,7 @@
             } else {
                 tokens = tokens - tokensNeeded;
                 currentPrice = currentPrice + tokenValue;
-                document.getElementById("tokens").innerHTML = tokens + "";
+                //document.getElementById("@userId tokens").innerHTML = tokens + "";
                 if (notFirst == 0)
                     currentPrice -= tokenValue;
                 //document.getElementById(auctionId + " price").innerHTML = currentPrice + "";
