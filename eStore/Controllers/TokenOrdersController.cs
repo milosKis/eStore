@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using eStore.fonts.Models;
 using Microsoft.AspNet.Identity;
+using eStore.Hubs;
 
 namespace eStore.Controllers
 {
@@ -33,9 +34,30 @@ namespace eStore.Controllers
 
             var userId = User.Identity.GetUserId();
             var orders = _context.TokenOrders.Where(o => o.User.Id == userId).ToList();
+            var user = _context.Users.Where(u => u.Id == userId).SingleOrDefault();
+            if (user != null)
+                ViewBag.NumOfTokens = user.NumOfTokens;
 
             return View(orders);
         }
+
+        [Authorize]
+        public ActionResult IndexCancel()
+        {
+            if (User.IsInRole(RoleName.MaintenanceManager))
+                return HttpNotFound();
+            ViewBag.Message = "Order is canceled!";
+
+            var userId = User.Identity.GetUserId();
+            var orders = _context.TokenOrders.Where(o => o.User.Id == userId).ToList();
+            var user = _context.Users.Where(u => u.Id == userId).SingleOrDefault();
+            if (user != null)
+                ViewBag.NumOfTokens = user.NumOfTokens;
+
+            return View("Index", orders);
+        }
+
+
 
         [Authorize]
         public ActionResult Create(TokenOrderViewModel model)
@@ -88,7 +110,7 @@ namespace eStore.Controllers
             _context.TokenOrders.Add(order);
             _context.SaveChanges();
 
-            return Redirect("http://stage.centili.com/payment/widget?apikey=162e68d0383d8eac6835fffac0759ec5&country=rs&reference=" + order.Id + "&returnurl=http://localhost:62040/TokenOrders/FinishedPaying");
+            return Redirect("http://stage.centili.com/payment/widget?apikey=162e68d0383d8eac6835fffac0759ec5&country=rs&reference=" + order.Id + "&returnurl=http://km150066d.azurewebsites.net/TokenOrders/FinishedPaying");
             //return RedirectToAction("New");
         }
 
@@ -121,6 +143,11 @@ namespace eStore.Controllers
             ViewBag.GoldPrice = GoldCount * TokenValue;
             ViewBag.PlatinumPrice = PlatinumCount * TokenValue;
 
+            var userId = User.Identity.GetUserId();
+            var user = _context.Users.Where(u => u.Id == userId).SingleOrDefault();
+            if (user != null)
+                ViewBag.NumOfTokens = user.NumOfTokens;
+
             TokenOrderViewModel model = new TokenOrderViewModel
             {
                 GoldCount = 0,
@@ -142,19 +169,29 @@ namespace eStore.Controllers
                 return RedirectToAction("Index");
             }
 
+            ApplicationUser user = _context.Users.SingleOrDefault(u => u.Id == userId);
+            if (user == null)
+                return RedirectToAction("Index");
+
             if (status == "success")
             {
-                ApplicationUser user = _context.Users.SingleOrDefault(u => u.Id == userId);
-                if (user == null)
-                    return View("Index");
                 user.NumOfTokens += order.NumOfTokens;
                 order.State = TokenOrderState.Completed;
+                var hub = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<MyHub>();
+                hub.Clients.All.updateNumOfTokens(userId, order.NumOfTokens);
                 _context.SaveChanges();
+                string title = "Token order!";
+                string message = "You have just ordered " + order.NumOfTokens + " tokens!"; 
+                string email = user.Email;
+                //this is place for code that actually sends email
+                Email.Send(email, title, message);
             }
             else
             {
                 order.State = TokenOrderState.Canceled;
-                _context.SaveChanges();              
+                ViewBag.Message = "Order is canceled!";
+                _context.SaveChanges();
+                return RedirectToAction("IndexCancel");
             }
 
             return RedirectToAction("Index");

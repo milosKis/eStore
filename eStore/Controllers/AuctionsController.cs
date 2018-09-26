@@ -45,7 +45,10 @@ namespace eStore.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var auctions = _context.Auctions.Include(a => a.User).Where(a => a.Duration > 0);
+            var auctions = _context.Auctions.
+                Include(a => a.User).
+                Include(a => a.LastBidder).
+                Where(a => a.Duration > 0);
 
             if (lowPrice != null)
             {
@@ -227,7 +230,7 @@ namespace eStore.Controllers
                         string message = "Congratulations! You have won the " + auction.Name + "(id = " + auction.Id + ")!";
                         string email = auction.LastBidder.Email;
                         //this is place for code that actually sends email
-               //        Email.Send(email, title, message);
+                       Email.Send(email, title, message);
                     }
 
                     _context.SaveChanges();

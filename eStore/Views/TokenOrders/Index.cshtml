@@ -1,11 +1,35 @@
 ﻿@model List<eStore.Models.TokenOrder>
+@using eStore.Models
+@using Microsoft.AspNet.Identity
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string userId = "";
+    string user = "";
+    if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+    {
+        userId = User.Identity.GetUserId();
+        user = User.Identity.GetUserName();
+    }
 }
 
 <h2>My orders</h2>
+@if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
+{
+    <div>
+        <div id="@userId tokens" style="float: left;">@ViewBag.NumOfTokens</div>&nbsp;&nbsp;
+        <img src="~/images/token.png" />
+    </div>
 
+}
+<br /><br />
+
+@if (ViewBag.Message != null)
+{
+    <h4><span class="label label-danger">@ViewBag.Message</span></h4>
+}
+<br />
 @if (Model.Count == 0)
 {
     <h3>You haven't ordered anything yet!</h3>
@@ -14,16 +38,16 @@ else
 {
     <table id="orders" class="table table-hover" style="margin-top: 40px;">
         <thead>
-        <tr>
-            <th>Ordered on</th>
-            <th>Number of tokens</th>
-            <th>Price</th>
-            <th>Currency</th>
-            <th>Status</th>
-        </tr>
+            <tr>
+                <th>Ordered on</th>
+                <th>Number of tokens</th>
+                <th>Price</th>
+                <th>Currency</th>
+                <th>Status</th>
+            </tr>
         </thead>
         <tbody>
-            @foreach(var order in Model)
+            @foreach (var order in Model)
             {
                 <tr>
                     <td>@order.DateTimeCreated</td>
@@ -38,11 +62,32 @@ else
 }
 
 
-@section scripts 
+@section scripts
 {
+    <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
+    <script src="~/signalr/js"></script>
+
     <script>
-        $(document).ready(function() {
-            $('#orders').DataTable();
+        var myHub = $.connection.hub.start();
+
+        $.connection.hub.disconnected(function () {
+
+            setTimeout(function () {
+                myHub = $.connection.hub.start();
+                console.log("disconnected");
+            }, 5000);
         });
+
+        $.connection.myHub.client.updateNumOfTokens = function (userId, numOfTokens) {
+            var tokens = document.getElementById(userId + " tokens");
+            if (tokens != null)
+                tokens.innerHTML = parseFloat(tokens.innerHTML) + numOfTokens;
+        }
+    </script>
+
+    <script>
+            $(document).ready(function () {
+                $('#orders').DataTable();
+            });
     </script>
 }

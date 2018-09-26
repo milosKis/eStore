@@ -35,29 +35,29 @@ namespace eStore.Controllers
 
 
         [Authorize]
-        public ActionResult Create(int numOfTokens, int auctionId)
+        public JsonResult Create(int numOfTokens, int auctionId)
         {
             if (User.IsInRole(RoleName.MaintenanceManager))
             {
-                return HttpNotFound();
+                return Json(-1);
             }
 
 
             if (numOfTokens < 0)
             {
-                return HttpNotFound();
+                return Json(-1);
                 //return error message
             }
 
             Auction auction = _context.Auctions.Include(a => a.LastBidder).Include(a => a.User).SingleOrDefault(a => a.Id == auctionId);
             if (auction == null || auction.State != AuctionState.Opened)
             {
-                return HttpNotFound();
+                return Json(-1);
             }
 
             if ((numOfTokens == 0) && (auction.LastBidder != null))
             {
-                return HttpNotFound();
+                return Json(-1);
             }
 
             var tokenValueString = eStore.fonts.Models.Constants.TokenValue;
@@ -68,7 +68,7 @@ namespace eStore.Controllers
 
             if (userId == auction.User.Id)
             {
-                return HttpNotFound();
+                return Json(-1);
             }
 
             double tokensNeeded = auction.CurrentPrice / tokenValue;
@@ -84,9 +84,9 @@ namespace eStore.Controllers
             if (user.NumOfTokens < tokensNeeded)
             {
                 if (auction.LastBidder.Id != userId)
-                    return HttpNotFound();
+                    return Json(-1);
                 else if (user.NumOfTokens < numOfTokens)
-                    return HttpNotFound();
+                    return Json(-1);
             }
 
             Bid lastBid = _context.Bids.Include(b => b.Auction).Include(b => b.User).OrderByDescending(b => b.DateTimeCreated).FirstOrDefault(b => b.Auction.Id == auctionId);
@@ -127,8 +127,10 @@ namespace eStore.Controllers
             {
                 hub.Clients.All.updateNumOfTokens(userId, tokensNeeded * (-1));
             }
-                
-            return RedirectToAction("Details", "Auctions", new {id = auctionId });
+
+            string[] jsonRes = { auction.CurrentPrice + " " + auction.Currency, user.Email };
+            return Json(jsonRes);
+            //return RedirectToAction("Details", "Auctions", new {id = auctionId });
         }
     }
 }

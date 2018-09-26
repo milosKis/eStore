@@ -335,7 +335,7 @@
                 //document.getElementById("@userId tokens").innerHTML = tokens - tokensNeeded;
                 //window.location.href = '@Url.Action("Create", "Bids")/?numOfTokens=' + tokensToBid + "&auctionId=@Model.Auction.Id";
                 $.ajax({
-                    type: "GET",
+                    type: "POST",
                     url: "/Bids/Create/?numOfTokens=" + tokensToBid + "&auctionId=" + "@Model.Auction.Id",
                     dataType: "json",
                     contentType: "application/json; charset=utf-8",
