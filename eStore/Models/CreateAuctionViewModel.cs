@@ -18,6 +18,7 @@ namespace eStore.Models
 
         [Required]
         [NumberBiggerThanZeroDuration]
+        [Display(Name = "Duration in seconds")]
         public long Duration { get; set; }
 
         [Required]

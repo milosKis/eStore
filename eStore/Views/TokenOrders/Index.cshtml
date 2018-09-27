@@ -80,8 +80,10 @@ else
 
         $.connection.myHub.client.updateNumOfTokens = function (userId, numOfTokens) {
             var tokens = document.getElementById(userId + " tokens");
-            if (tokens != null)
-                tokens.innerHTML = parseFloat(tokens.innerHTML) + numOfTokens;
+            if (tokens != null) {
+                numOfTokens = parseFloat(tokens.innerHTML) + numOfTokens;
+                tokens.innerHTML = numOfTokens.toFixed(2);
+            }
         }
     </script>
 

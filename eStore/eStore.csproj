@@ -477,6 +477,7 @@
     <Content Include="images\gold.png" />
     <Content Include="images\platinum.png" />
     <Content Include="images\silver.png" />
+    <Content Include="images\smallToken.png" />
     <Content Include="images\token.png" />
     <Content Include="Scripts\bootbox.js" />
     <Content Include="Scripts\bootbox.min.js" />

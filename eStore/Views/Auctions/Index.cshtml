@@ -124,9 +124,18 @@
                 {
                     <span class="card-text" style="margin-bottom: 5px;"><text id="@auction.Id"></text></span>
                 }
-                <br/>
+                <br />
 
                 <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id price">@auction.CurrentPrice</text><text> @auction.Currency</text></span><br />
+
+                @{
+                    double tokenValue = Convert.ToDouble(ViewBag.TokenValue);
+                    double priceInTokens = auction.CurrentPrice / tokenValue;
+                    priceInTokens = Math.Round(priceInTokens, 2);
+                }
+
+                <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id priceInTokens">@priceInTokens</text> <img src="~/images/smallToken.png" /></span><br />
+
                 @if (auction.LastBidder != null)
                 {
                     <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id name">@auction.LastBidder.Email</text></span><br />
@@ -209,10 +218,14 @@
             }, 5000);
         });
 
-        $.connection.myHub.client.updatePriceAndBidder = function(newPrice, newBidder, auctionId) {
+        $.connection.myHub.client.updatePriceAndBidder = function(newPrice, newPriceInTokens, newBidder, auctionId) {
             var priceField = document.getElementById(auctionId + " price");
             if (priceField != null)
                 priceField.innerHTML = newPrice;
+
+            var priceInTokensField = document.getElementById(auctionId + " priceInTokens");
+            if (priceInTokensField != null)
+                priceInTokensField.innerHTML = newPriceInTokens;
 
             var nameField = document.getElementById(auctionId + " name");
             if (nameField != null)
@@ -222,8 +235,10 @@
         $.connection.myHub.client.updateNumOfTokens = function(userId, numOfTokens)
         {
             var tokens = document.getElementById(userId + " tokens");
-            if (tokens != null)
-                tokens.innerHTML = parseFloat(tokens.innerHTML) + numOfTokens;
+            if (tokens != null) {
+                numOfTokens = parseFloat(tokens.innerHTML) + numOfTokens;
+                tokens.innerHTML = numOfTokens.toFixed(2);
+            }
         }
 
         $.connection.myHub.client.updateStateAndTimer = function(auctionId, time, userId) {

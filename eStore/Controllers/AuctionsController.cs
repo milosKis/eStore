@@ -10,7 +10,6 @@ using Microsoft.AspNet.Identity;
 using System.Data.Entity;
 using Microsoft.Ajax.Utilities;
 using PagedList;
-using eStore.Models;
 using eStore.Hubs;
 
 namespace eStore.Controllers
@@ -106,12 +105,15 @@ namespace eStore.Controllers
             }
             
             int pageNumber = (page ?? 1);
+
+            var tokenValue = eStore.fonts.Models.Constants.TokenValue;
+            ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
             if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
             {
                 var userId = User.Identity.GetUserId();
-                ViewBag.NumOfTokens = _context.Users.SingleOrDefault(u => u.Id == userId).NumOfTokens;
-                var tokenValue = eStore.fonts.Models.Constants.TokenValue;
-                ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
+                double numOfTokens = Convert.ToDouble(_context.Users.SingleOrDefault(u => u.Id == userId).NumOfTokens);
+                numOfTokens = Math.Round(numOfTokens, 2);
+                ViewBag.NumOfTokens = numOfTokens;
             }
             //return View(auctions.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize));
             return View(PagedListExtensions.ToPagedList(newList.OrderByDescending(a => a.DateTimeCreated), pageNumber, pageSize));
@@ -202,12 +204,13 @@ namespace eStore.Controllers
             }
 
             int pageNumber = (page ?? 1);
+
+            var tokenValue = eStore.fonts.Models.Constants.TokenValue;
+            ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
             if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
             {
                 //var userId = User.Identity.GetUserId();
                 ViewBag.NumOfTokens = _context.Users.SingleOrDefault(u => u.Id == userId).NumOfTokens;
-                var tokenValue = eStore.fonts.Models.Constants.TokenValue;
-                ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
             }
             //return View(auctions.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize));
             return View(PagedListExtensions.ToPagedList(newList.OrderByDescending(a => a.DateTimeCreated), pageNumber, pageSize));
@@ -323,6 +326,9 @@ namespace eStore.Controllers
             }
             int pageNumber = (page ?? 1);
 
+            var tokenValue = eStore.fonts.Models.Constants.TokenValue;
+            ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
+
             return View(PagedListExtensions.ToPagedList(newList.OrderBy(a => a.DateTimeCreated), pageNumber, pageSize));
         }
 
@@ -401,6 +407,9 @@ namespace eStore.Controllers
             }
             int pageNumber = (page ?? 1);
 
+            var tokenValue = eStore.fonts.Models.Constants.TokenValue;
+            ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
+
             return View(PagedListExtensions.ToPagedList(newList.OrderByDescending(a => a.DateTimeCreated), pageNumber, pageSize));
         }
 
@@ -425,6 +434,9 @@ namespace eStore.Controllers
         [Authorize]
         public ActionResult New()
         {
+            ViewBag.CurrentCurrency =
+                _context.AppSettings.SingleOrDefault(s => s.Name == eStore.fonts.Models.Constants.CurrentCurrency).Value;
+
             return View("Create");
         }
 
@@ -432,6 +444,9 @@ namespace eStore.Controllers
         [HttpPost]
         public ActionResult Create(CreateAuctionViewModel auctionViewModel)
         {
+            ViewBag.CurrentCurrency =
+                _context.AppSettings.SingleOrDefault(s => s.Name == eStore.fonts.Models.Constants.CurrentCurrency).Value;
+
             if (!ModelState.IsValid)
             {
                 return View("Create", auctionViewModel);
@@ -470,12 +485,15 @@ namespace eStore.Controllers
             CheckAuctions();
             AuctionDetailsModel model = new AuctionDetailsModel();
             var auction = _context.Auctions.Include(a => a.User).Include(a => a.LastBidder).SingleOrDefault(a => a.Id == id);
+
+            var tokenValue = eStore.fonts.Models.Constants.TokenValue;
+            ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
             if (Request.IsAuthenticated && !User.IsInRole(RoleName.MaintenanceManager))
             {
                 var userId = User.Identity.GetUserId();
-                ViewBag.NumOfTokens = _context.Users.SingleOrDefault(u => u.Id == userId).NumOfTokens;
-                var tokenValue = eStore.fonts.Models.Constants.TokenValue;
-                ViewBag.TokenValue = _context.AppSettings.SingleOrDefault(s => s.Name == tokenValue).Value;
+                double numOfTokens = Convert.ToDouble(_context.Users.SingleOrDefault(u => u.Id == userId).NumOfTokens);
+                numOfTokens = Math.Round(numOfTokens, 2);
+                ViewBag.NumOfTokens = numOfTokens;
             }
 
             if (auction == null)

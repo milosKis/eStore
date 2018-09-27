@@ -97,7 +97,8 @@ namespace eStore.Controllers
             }
 
             auction.LastBidder = user;
-            auction.CurrentPrice = tokensNeeded * tokenValue;
+            tokensNeeded = Math.Round(tokensNeeded, 2);
+            auction.CurrentPrice = Math.Round(tokensNeeded * tokenValue, 2);
             user.NumOfTokens -= tokensNeeded;
             Bid bid = new Bid
             {
@@ -110,22 +111,28 @@ namespace eStore.Controllers
             _context.Bids.Add(bid);
             _context.SaveChanges();
 
+            
             var hub = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<MyHub>();
-            hub.Clients.All.updatePriceAndBidder(auction.CurrentPrice, user.Email, auction.Id);
+            hub.Clients.All.updatePriceAndBidder(auction.CurrentPrice, tokensNeeded, user.Email, auction.Id);
             hub.Clients.All.updateBidList(string.Format("{0:dd-MMM-yy hh:mm:ss tt}", bid.DateTimeCreated), user.Email, bid.NumOfTokens, auction.Id);
             if (lastBid != null)
             {
                 if (lastBid.User.Id != userId)
                 {
                     hub.Clients.All.updateNumOfTokens(lastBid.User.Id, lastBid.NumOfTokens);
-                    hub.Clients.All.updateNumOfTokens(userId, tokensNeeded * (-1));
+                    tokensNeeded = Math.Round(tokensNeeded * (-1), 2);
+                    hub.Clients.All.updateNumOfTokens(userId, tokensNeeded);
                 }
                 else
-                    hub.Clients.All.updateNumOfTokens(lastBid.User.Id, lastBid.NumOfTokens - tokensNeeded);
+                {
+                    tokensNeeded = Math.Round(lastBid.NumOfTokens - tokensNeeded, 2);
+                    hub.Clients.All.updateNumOfTokens(lastBid.User.Id, tokensNeeded);
+                }
             }
             else
             {
-                hub.Clients.All.updateNumOfTokens(userId, tokensNeeded * (-1));
+                tokensNeeded = Math.Round(tokensNeeded * (-1), 2);
+                hub.Clients.All.updateNumOfTokens(userId, tokensNeeded);
             }
 
             string[] jsonRes = { auction.CurrentPrice + " " + auction.Currency, user.Email };

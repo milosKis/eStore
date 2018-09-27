@@ -36,7 +36,11 @@ namespace eStore.Controllers
             var orders = _context.TokenOrders.Where(o => o.User.Id == userId).ToList();
             var user = _context.Users.Where(u => u.Id == userId).SingleOrDefault();
             if (user != null)
-                ViewBag.NumOfTokens = user.NumOfTokens;
+            {
+                double numOfTokens = user.NumOfTokens;
+                numOfTokens = Math.Round(numOfTokens, 2);
+                ViewBag.NumOfTokens = numOfTokens;
+            }
 
             return View(orders);
         }
@@ -52,7 +56,11 @@ namespace eStore.Controllers
             var orders = _context.TokenOrders.Where(o => o.User.Id == userId).ToList();
             var user = _context.Users.Where(u => u.Id == userId).SingleOrDefault();
             if (user != null)
-                ViewBag.NumOfTokens = user.NumOfTokens;
+            {
+                double numOfTokens = user.NumOfTokens;
+                numOfTokens = Math.Round(numOfTokens, 2);
+                ViewBag.NumOfTokens = numOfTokens;
+            }
 
             return View("Index", orders);
         }
@@ -146,7 +154,12 @@ namespace eStore.Controllers
             var userId = User.Identity.GetUserId();
             var user = _context.Users.Where(u => u.Id == userId).SingleOrDefault();
             if (user != null)
-                ViewBag.NumOfTokens = user.NumOfTokens;
+            {
+                double numOfTokens = user.NumOfTokens;
+                numOfTokens = Math.Round(numOfTokens, 2);
+                ViewBag.NumOfTokens = numOfTokens;
+            }
+                
 
             TokenOrderViewModel model = new TokenOrderViewModel
             {

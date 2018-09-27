@@ -51,6 +51,14 @@
             <div class="card-body">
                 <span class="label label-default" style="margin-bottom: 5px;">@auction.State</span><br />
                 <span class="label label-default" style="margin-bottom: 5px;">@auction.CurrentPrice @auction.Currency</span><br />
+                @{
+                    double tokenValue = Convert.ToDouble(ViewBag.TokenValue);
+                    double priceInTokens = auction.CurrentPrice / tokenValue;
+                    priceInTokens = Math.Round(priceInTokens, 2);
+                }
+
+                <span class="label label-default" style="margin-bottom: 5px;"><text id="@auction.Id priceInTokens">@priceInTokens</text> <img src="~/images/smallToken.png" /></span><br />
+
                 <span class="label label-default" style="margin-bottom: 5px;">@auction.User.Email</span><br />
                 <button class="btn btn-primary" style="margin: 5px;"><a href='@Url.Action("Update", "Auctions", new {id = auction.Id, state = AuctionState.Opened})' style="text-decoration: none; color: white;">Start</a></button>
             </div>
